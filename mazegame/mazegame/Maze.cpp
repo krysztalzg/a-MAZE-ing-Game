@@ -96,7 +96,7 @@ void Maze::generateMaze() {
 	/*	Finding finish field on the edge of maze	*/
 	do
 		end = &fields[rand() % MSIZE][rand() % MSIZE];
-	while ((!end->type == ' ') || !(end->row == 1 || end->column == 1 || end->row == (MSIZE - 2) || end->column == (MSIZE - 2)));
+	while (!(end->type == ' ') || !(end->row == 1 || end->column == 1 || end->row == (MSIZE - 2) || end->column == (MSIZE - 2)));
 	
 	if (end->row == 1)
 		end = &fields[0][end->column];

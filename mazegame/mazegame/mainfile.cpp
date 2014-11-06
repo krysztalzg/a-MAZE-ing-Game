@@ -1,14 +1,12 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Maze.h"
+#include "Application.h"
 
 int main() {
-	srand(time(NULL));
-	Maze *maze = new Maze();
+	srand((unsigned int)time(NULL));
 
-	maze->show();
+	Application* app = new Application();
 
-	system("pause");
 	return 0;
 }
