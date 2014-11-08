@@ -17,8 +17,9 @@ public:
 	Field *start, *end;
 	Field fields[MSIZE][MSIZE];
 	vector<Field*> path;
+	bool finished;
 
-	void show();
+	void show(int, int);
 	void findNeighbours(Field*);
 	void generateMaze();
 	Maze();

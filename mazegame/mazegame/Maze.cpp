@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
+#include "Player.h"
 #include "Maze.h"
 
 using namespace std;
@@ -22,6 +24,7 @@ Maze::Maze()
 		}
 	}
 	generateMaze();
+	finished = false;
 }
 
 void Maze::findNeighbours(Field* field) {
@@ -44,11 +47,17 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
-void Maze::show() {
+void Maze::show(int pCol, int pRow) {
 	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows)
-			cout << f.type;
+			if ((abs(pCol - f.column) < 3 && abs(pRow - f.row) < 3) ||
+				(abs(pCol - f.column) < 2 && abs(pRow - f.row) < 4) ||
+				(abs(pCol - f.column) < 4 && abs(pRow - f.row) < 2) ||
+				finished)
+				cout << f.type;
+			else
+				cout << ' ';
 		cout << endl;
 	}
 }
