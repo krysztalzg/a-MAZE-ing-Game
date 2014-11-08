@@ -6,7 +6,7 @@ public:
 	int steps;
 	Field* current;
 
-	void processMove(Maze*, string);
+	void processMove(Maze*, int);
 
 	Player();
 	~Player();

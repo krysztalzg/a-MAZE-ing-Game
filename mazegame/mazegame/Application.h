@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 class Player;
 class Maze;
 
@@ -10,7 +11,6 @@ public:
 	Maze* maze;
 
 	void ApplicationMainLoop();
-	int ApplicationStatusManager(std::string);
 
 	Application();
 	~Application();

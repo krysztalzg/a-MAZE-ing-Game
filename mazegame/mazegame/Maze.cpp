@@ -45,6 +45,7 @@ void Maze::findNeighbours(Field* field) {
 }
 
 void Maze::show() {
+	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows)
 			cout << f.type;

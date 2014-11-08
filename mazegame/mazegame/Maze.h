@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#define MSIZE 6
+#define MSIZE 15
 
 using namespace std;
 
