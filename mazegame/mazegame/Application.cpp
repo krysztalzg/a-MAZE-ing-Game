@@ -15,13 +15,12 @@ Application::Application() {
 	player->current = maze->start;
 	
 	ApplicationMainLoop();
-	cout << endl << "WIN!" << endl;
+	cout << endl << "WIN! Steps: " << player->steps << "\tShortest: " << maze->end->steps << endl;
 	system("pause");
 }
 
 
-Application::~Application() {
-}
+Application::~Application() {}
 
 void Application::ApplicationMainLoop() {
 	RenderWindow window(VideoMode(500, 500), "a-MAZE-ing Game");
@@ -45,6 +44,12 @@ void Application::ApplicationMainLoop() {
 					break;
 				case Keyboard::Right:
 					player->processMove(maze, 4);
+					break;
+				case Keyboard::F5:
+					saveGame();
+					break;
+				case Keyboard::F9:
+					loadGame();
 					break;
 				}
 				if (player->current->column == 0 || player->current->column == MSIZE - 1 ||

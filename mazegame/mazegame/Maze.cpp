@@ -7,8 +7,7 @@
 
 using namespace std;
 
-Maze::Maze()
-{
+Maze::Maze() {
 	for (int i = 0; i < MSIZE; i++) {
 		for (int j = 0; j < MSIZE; j++) {
 			if (i == 0 || j == 0 || i == (MSIZE-1) || j == (MSIZE-1))
@@ -50,21 +49,24 @@ void Maze::findNeighbours(Field* field) {
 void Maze::show(int pCol, int pRow) {
 	system("cls");
 	for (auto& rows : fields) {
-		for (auto& f : rows)
-			if ((abs(pCol - f.column) < 3 && abs(pRow - f.row) < 3) ||
+		for (auto& f : rows) {
+			/*if ((abs(pCol - f.column) < 3 && abs(pRow - f.row) < 3) ||
 				(abs(pCol - f.column) < 2 && abs(pRow - f.row) < 4) ||
 				(abs(pCol - f.column) < 4 && abs(pRow - f.row) < 2) ||
-				finished)
+				finished || f.seen) {*/
 				cout << f.type;
+
+			f.seen = true;
+			/*}
 			else
-				cout << ' ';
-		cout << endl;
-	}
+			cout << ' ';*/
+		}
+			cout << endl;
+		}
+	
 }
 
-Maze::~Maze()
-{
-}
+Maze::~Maze(){}
 
 
 void Maze::generateMaze() {
@@ -74,7 +76,7 @@ void Maze::generateMaze() {
 	do
 	start = &fields[rand() % MSIZE][rand() % MSIZE];
 	while (start->type != ' ');
-
+	start->steps = 0;
 	start->visited = true;
 
 	current = start;
@@ -86,7 +88,9 @@ void Maze::generateMaze() {
 		if (!current->neighbours.empty()) {
 			next = current->neighbours[rand() % current->neighbours.size()];
 			fields[(current->row + next->row) / 2][(current->column + next->column) / 2].type = ' ';
+			fields[(current->row + next->row) / 2][(current->column + next->column) / 2].steps = current->steps + 1;
 			next->visited = true;
+			next->steps = current->steps + 2;
 			path.push_back(current);
 			current->neighbours.clear();
 			current = next;
@@ -108,14 +112,21 @@ void Maze::generateMaze() {
 		end = &fields[rand() % MSIZE][rand() % MSIZE];
 	while (!(end->type == ' ') || !(end->row == 1 || end->column == 1 || end->row == (MSIZE - 2) || end->column == (MSIZE - 2)));
 	
-	if (end->row == 1)
+	if (end->row == 1) {
 		end = &fields[0][end->column];
-	else if (end->row == MSIZE - 2)
+		end->steps = fields[1][end->column].steps + 1;
+	}
+	else if (end->row == MSIZE - 2) {
 		end = &fields[MSIZE - 1][end->column];
-	else if (end->column == 1)
+		end->steps = fields[MSIZE - 2][end->column].steps + 1;
+	}
+	else if (end->column == 1) {
 		end = &fields[end->row][0];
-	else if (end->column == MSIZE - 2)
+		end->steps = fields[end->row][1].steps + 1;
+	}
+	else if (end->column == MSIZE - 2) {
 		end = &fields[end->row][MSIZE - 1];
-	
+		end->steps = fields[end->row][MSIZE - 2].steps + 1;
+	}
 	end->type = ' ';
 }
