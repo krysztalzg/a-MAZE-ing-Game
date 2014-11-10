@@ -4,6 +4,7 @@
 #include <SFML\Graphics.hpp>
 
 #include "Player.h"
+#include "Alcohol.h"
 #include "Maze.h"
 #include "Application.h"
 
@@ -24,7 +25,7 @@ void Application::ApplicationMainLoop() {
 	Event event;
 	string temp;
 
-	maze->show(player->current->column, player->current->row);
+	maze->show(player);
 
 	while (window.isOpen()) {
 		while (window.pollEvent(event)) {
@@ -48,10 +49,19 @@ void Application::ApplicationMainLoop() {
 					sleep(seconds(1));
 					break;
 				case Keyboard::F9:
-					loadGame();
-					maze->show(player->current->column, player->current->row);
-					cout << endl << "Game loaded" << endl;
-					sleep(seconds(1));
+						loadGame();
+						maze->show(player);
+						cout << endl << "Game loaded" << endl;
+						sleep(seconds(1));
+					break;
+				case Keyboard::F:
+					if (player->collectedDrinks.size() > 0) {
+						player->collectedDrinks.back()->drink(player, maze);
+						player->collectedDrinks.pop_back();
+					}
+					break;
+				case Keyboard::Escape:
+					window.close();
 					break;
 				}
 				if (player->current->column == 0 || player->current->column == MSIZE - 1 ||
@@ -59,14 +69,13 @@ void Application::ApplicationMainLoop() {
 					maze->finished = true;
 					window.close();
 				}
-
-				maze->show(player->current->column, player->current->row);
+				maze->show(player);
 			}
 		}
 		window.clear(Color::Black);
 		window.display();
 	}
-	cout << endl << "WIN! Steps: " << player->steps << "\tShortest: " << maze->end->steps << endl;
+	cout << endl << "Steps: " << player->steps << "/" << maze->end->steps << endl;
 }
 
 void Application::saveGame() {
@@ -76,6 +85,8 @@ void Application::saveGame() {
 		for (int j = 0; j < MSIZE; ++j)
 			ofs.write((char*)&maze->fields[i][j], sizeof(maze->fields[i][j]));
 	}
+	ofs.write((char*)&maze->currentPage, sizeof(maze->currentPage));
+	ofs.write((char*)&maze->drinks, sizeof(maze->drinks));
 	ofs.write((char*)&player, sizeof(player));
 	ofs.write((char*)&player->current, sizeof(player->current));
 	ofs.close();
@@ -84,9 +95,12 @@ void Application::saveGame() {
 void Application::loadGame() {
 	ifstream ifs("game.save", ios::binary); 
 	for (int i = 0; i < MSIZE; ++i)
-		for (int j = 0; j < MSIZE; ++j)
+		for (int j = 0; j < MSIZE; ++j) {
 			ifs.read((char*)&maze->fields[i][j], sizeof(maze->fields[i][j]));
-
+			maze->fields[i][j].seen = false;
+		}
+	ifs.read((char*)&maze->currentPage, sizeof(maze->currentPage));
+	ifs.read((char*)&maze->drinks, sizeof(maze->drinks));
 	ifs.read((char*)&player, sizeof(player));
 	ifs.read((char*)&player->current, sizeof(player->current));
 	ifs.close();

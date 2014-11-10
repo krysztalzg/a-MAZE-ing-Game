@@ -24,6 +24,8 @@ Maze::Maze() {
 			fields[i][j].visited = false;
 		}
 	}
+	amountDrinks = MSIZE / 5;
+	amountPages = MSIZE / 10;
 	generateMaze();
 	finished = false;
 }
@@ -48,24 +50,60 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
-void Maze::show(int pCol, int pRow) {
+//void Maze::show(int pCol, int pRow, int pFov) {
+void Maze::show(Player* player) {
+	bool temp = false;
+
 	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows) {
-			/*if ((abs(pCol - f.column) < 3 && abs(pRow - f.row) < 3) ||
-				(abs(pCol - f.column) < 2 && abs(pRow - f.row) < 4) ||
-				(abs(pCol - f.column) < 4 && abs(pRow - f.row) < 2) ||
-				finished || f.seen) {*/
-				cout << f.type;
+			/*if ((abs(player->current->column - f.column) < player->fov && abs(player->current->row - f.row) < player->fov) ||
+				(abs(player->current->column - f.column) < player->fov - 1 && abs(player->current->row - f.row) < player->fov + 1) ||
+				(abs(player->current->column - f.column) < player->fov + 1 && abs(player->current->row - f.row) < player->fov - 1) ||
+				finished || f.seen) */{
+			if (currentPage->column == f.column && currentPage->row == f.row && !currentPage->collected)		// displaying page
+				cout << '!';
+			else {																								
+				for (auto drink : drinks)
+					if (drink->column == f.column && drink->row == f.row && !drink->collected) {				// if there's drink on field diplay it
+						cout << '^';
+						temp = true;
+						break;
+					}
+						if (!temp)																				// otherwise display normal field - wall or empty
+						cout << f.type;	
+						temp = false;
+			}
 
 			f.seen = true;
-			/*}
-			else
+			}
+			/*else
 			cout << ' ';*/
+		}
+		/*	Disaplying statiscitcs	*/
+		switch (rows[0].row) {
+		case 0:
+			cout << player->current->row << "  " << player->current->column;
+			//cout << "Shortest way: " << end->steps;
+			break;
+		case 2:
+			cout << "Pages: " << player->collectedPages << "/" << amountPages;
+			break;
+		case 3:
+			cout << "'Magic' drinks: " << player->collectedDrinks.size() << "/" << amountDrinks;
+			break;
+		case 5:
+			cout << "Player FOV: " << player->fov << " fields";
+			break;
+		case 7:
+			cout << "Press F to drink (FOV + 1)";
+			break;
 		}
 			cout << endl;
 		}
-	
+
+	for (auto drink : drinks)
+		cout << drink->row << "-" << drink->column << "-" << drink->collected << " | ";
 }
 
 Maze::~Maze(){}
@@ -130,5 +168,13 @@ void Maze::generateMaze() {
 		end = &fields[end->row][MSIZE - 1];
 		end->steps = fields[end->row][MSIZE - 2].steps + 1;
 	}
-	end->type = ' ';
+	//end->type = ' ';
+
+	/*	Spawning 1st page and drinks	*/
+	/*Page* page = new Page(this);
+	pages.push_back(page);*/
+	new Page(this);
+
+	for (int drink = 0; drink < amountDrinks; ++drink)
+		drinks.push_back(new Alcohol(this));
 }
