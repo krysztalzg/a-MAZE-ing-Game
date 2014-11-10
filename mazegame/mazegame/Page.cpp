@@ -28,8 +28,6 @@ Page::Page(Maze* maze) {
 	row = temp->row;
 	column = temp->column;
 	collected = false;
-
-	maze->currentPage = this;
 }
 
 

@@ -50,17 +50,16 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
-//void Maze::show(int pCol, int pRow, int pFov) {
 void Maze::show(Player* player) {
 	bool temp = false;
 
 	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows) {
-			/*if ((abs(player->current->column - f.column) < player->fov && abs(player->current->row - f.row) < player->fov) ||
+			if ((abs(player->current->column - f.column) < player->fov && abs(player->current->row - f.row) < player->fov) ||
 				(abs(player->current->column - f.column) < player->fov - 1 && abs(player->current->row - f.row) < player->fov + 1) ||
 				(abs(player->current->column - f.column) < player->fov + 1 && abs(player->current->row - f.row) < player->fov - 1) ||
-				finished || f.seen) */{
+				finished || f.seen) {
 			if (currentPage->column == f.column && currentPage->row == f.row && !currentPage->collected)		// displaying page
 				cout << '!';
 			else {																								
@@ -77,26 +76,25 @@ void Maze::show(Player* player) {
 
 			f.seen = true;
 			}
-			/*else
-			cout << ' ';*/
+			else
+			cout << ' ';
 		}
 		/*	Disaplying statiscitcs	*/
 		switch (rows[0].row) {
 		case 0:
-			cout << player->current->row << "  " << player->current->column;
-			//cout << "Shortest way: " << end->steps;
+			cout << "\tShortest way: " << end->steps;
 			break;
 		case 2:
-			cout << "Pages: " << player->collectedPages << "/" << amountPages;
+			cout << "\tPages: " << player->collectedPages << "/" << amountPages;
 			break;
 		case 3:
-			cout << "'Magic' drinks: " << player->collectedDrinks.size() << "/" << amountDrinks;
+			cout << "\t'Magic' drinks: " << player->collectedDrinks.size() << "/" << amountDrinks;
 			break;
-		case 5:
-			cout << "Player FOV: " << player->fov << " fields";
+		case 4:
+			cout << "\tPress F to drink (FOV + 1)";
 			break;
-		case 7:
-			cout << "Press F to drink (FOV + 1)";
+		case 6:
+			cout << "\tPlayer FOV: " << player->fov << " fields";
 			break;
 		}
 			cout << endl;
@@ -168,13 +166,11 @@ void Maze::generateMaze() {
 		end = &fields[end->row][MSIZE - 1];
 		end->steps = fields[end->row][MSIZE - 2].steps + 1;
 	}
-	//end->type = ' ';
 
-	/*	Spawning 1st page and drinks	*/
-	/*Page* page = new Page(this);
-	pages.push_back(page);*/
-	new Page(this);
+	/*	Spawning 1st page	*/
+	currentPage = new Page(this);
 
+	/*	Spawning drinks		*/
 	for (int drink = 0; drink < amountDrinks; ++drink)
 		drinks.push_back(new Alcohol(this));
 }

@@ -38,29 +38,10 @@ void Player::processMove(Maze* maze, int move) {
 	if (maze->currentPage->column == current->column && maze->currentPage->row == current->row && !maze->currentPage->collected)
 		maze->currentPage->collect(this, maze);
 		
-	/*{
-		/*collectedPages++;
-		decreaseFov();								// Picking up page decreases players FOV
-		maze->currentPage->collected = true;
-
-		if (collectedPages < maze->amountPages)		// Generating next page if not all got collected
-			maze->currentPage = new Page(maze);
-		else
-			maze->end->type = ' ';					// and opening exit if player collected all pages
-
-		for (int i = 0; i < MSIZE; ++i)				// After picking up page visibility of all fields
-			for (int j = 0; j < MSIZE; ++j)			// is cleared
-				maze->fields[i][j].seen = false;
-	}*/
 	/*	Collecting drink	*/
-	for (auto drink : maze->drinks) {
+	for (auto drink : maze->drinks)
 		if (drink->column == current->column && drink->row == current->row && !drink->collected)
 			drink->collect(this, maze);
-		/*{
-			collectedDrinks++;
-			drink->collected = true;
-		}*/
-	}
 		
 }
 
