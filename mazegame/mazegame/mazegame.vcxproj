@@ -82,19 +82,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Alcohol.cpp" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Corridor.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="mainfile.cpp" />
     <ClCompile Include="Maze.cpp" />
+    <ClCompile Include="Page.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Alcohol.h" />
     <ClInclude Include="Application.h" />
-    <ClInclude Include="Corridor.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Maze.h" />
+    <ClInclude Include="Page.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

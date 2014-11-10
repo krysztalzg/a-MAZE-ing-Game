@@ -5,11 +5,16 @@
 
 using namespace std;
 
+class Page;
+class Alcohol;
+
 struct Field {
 	int row, column, steps;
 	char type;
 	bool visited, seen;
-	vector<Field*> neighbours;
+	vector <Field*> neighbours;
+	vector <Alcohol*> drinks;
+	Page* pages[6];
 };
 
 class Maze {

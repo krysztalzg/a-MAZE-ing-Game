@@ -2,6 +2,8 @@
 #include <vector>
 #include <cmath>
 
+#include "Alcohol.h"
+#include "Page.h"
 #include "Player.h"
 #include "Maze.h"
 
