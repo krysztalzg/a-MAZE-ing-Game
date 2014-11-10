@@ -1,14 +1,14 @@
 #pragma once
 #include <vector>
 
-#define MSIZE 15
+#define MSIZE 11
 
 using namespace std;
 
 struct Field {
-	int row, column;
+	int row, column, steps;
 	char type;
-	bool visited;
+	bool visited, seen;
 	vector<Field*> neighbours;
 };
 

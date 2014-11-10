@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <SFML\Graphics.hpp>
 
 #include "Player.h"
@@ -13,10 +14,6 @@ Application::Application() {
 	maze = new Maze();
 	player = new Player();
 	player->current = maze->start;
-	
-	ApplicationMainLoop();
-	cout << endl << "WIN! Steps: " << player->steps << "\tShortest: " << maze->end->steps << endl;
-	system("pause");
 }
 
 
@@ -47,9 +44,14 @@ void Application::ApplicationMainLoop() {
 					break;
 				case Keyboard::F5:
 					saveGame();
+					cout << endl << "Game saved" << endl;
+					sleep(seconds(1));
 					break;
 				case Keyboard::F9:
 					loadGame();
+					maze->show(player->current->column, player->current->row);
+					cout << endl << "Game loaded" << endl;
+					sleep(seconds(1));
 					break;
 				}
 				if (player->current->column == 0 || player->current->column == MSIZE - 1 ||
@@ -64,4 +66,29 @@ void Application::ApplicationMainLoop() {
 		window.clear(Color::Black);
 		window.display();
 	}
+	cout << endl << "WIN! Steps: " << player->steps << "\tShortest: " << maze->end->steps << endl;
+}
+
+void Application::saveGame() {
+	ofstream ofs("game.save", ios::binary);
+
+	for (int i = 0; i < MSIZE; ++i) {
+		for (int j = 0; j < MSIZE; ++j)
+			ofs.write((char*)&maze->fields[i][j], sizeof(maze->fields[i][j]));
+	}
+	ofs.write((char*)&player, sizeof(player));
+	ofs.write((char*)&player->current, sizeof(player->current));
+	ofs.close();
+}
+
+void Application::loadGame() {
+	ifstream ifs("game.save", ios::binary); 
+	for (int i = 0; i < MSIZE; ++i)
+		for (int j = 0; j < MSIZE; ++j)
+			ifs.read((char*)&maze->fields[i][j], sizeof(maze->fields[i][j]));
+
+	ifs.read((char*)&player, sizeof(player));
+	ifs.read((char*)&player->current, sizeof(player->current));
+	ifs.close();
+	
 }

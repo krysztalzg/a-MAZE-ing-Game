@@ -11,6 +11,8 @@ public:
 	Maze* maze;
 
 	void ApplicationMainLoop();
+	void saveGame();
+	void loadGame();
 
 	Application();
 	~Application();
