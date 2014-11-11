@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 Maze::Maze() {
 	for (int i = 0; i < MSIZE; i++) {
 		for (int j = 0; j < MSIZE; j++) {
@@ -29,6 +30,8 @@ Maze::Maze() {
 	generateMaze();
 	finished = false;
 }
+
+
 
 void Maze::findNeighbours(Field* field) {
 	int col = field->column, row = field->row;
@@ -56,15 +59,17 @@ void Maze::show(Player* player) {
 	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows) {
-			if ((abs(player->current->column - f.column) < player->fov && abs(player->current->row - f.row) < player->fov) ||
-				(abs(player->current->column - f.column) < player->fov - 1 && abs(player->current->row - f.row) < player->fov + 1) ||
-				(abs(player->current->column - f.column) < player->fov + 1 && abs(player->current->row - f.row) < player->fov - 1) ||
+			if ((abs(player->getCurrent()->column - f.column) < player->getFov() && abs(player->getCurrent()->row - f.row) < player->getFov()) ||
+				(abs(player->getCurrent()->column - f.column) < player->getFov() - 1 && abs(player->getCurrent()->row - f.row) < player->getFov() + 1) ||
+				(abs(player->getCurrent()->column - f.column) < player->getFov() + 1 && abs(player->getCurrent()->row - f.row) < player->getFov() - 1) ||
 				finished || f.seen) {
-			if (currentPage->column == f.column && currentPage->row == f.row && !currentPage->collected)		// displaying page
+			if (player->getCurrent()->column == f.column && player->getCurrent()->row == f.row)
+				cout << '@';
+			else if (currentPage->getColumn() == f.column && currentPage->getRow() == f.row && !currentPage->getCollected())		// displaying page
 				cout << '!';
 			else {																								
 				for (auto drink : drinks)
-					if (drink->column == f.column && drink->row == f.row && !drink->collected) {				// if there's drink on field diplay it
+					if (drink->getColumn() == f.column && drink->getRow() == f.row && !drink->getCollected()) {				// if there's drink on field diplay it
 						cout << '^';
 						temp = true;
 						break;
@@ -79,29 +84,36 @@ void Maze::show(Player* player) {
 			else
 			cout << ' ';
 		}
+
 		/*	Disaplying statiscitcs	*/
 		switch (rows[0].row) {
 		case 0:
 			cout << "\tShortest way: " << end->steps;
 			break;
 		case 2:
-			cout << "\tPages: " << player->collectedPages << "/" << amountPages;
+			cout << "\tPages: " << player->getCollectedPages() << "/" << amountPages;
 			break;
 		case 3:
-			cout << "\t'Magic' drinks: " << player->collectedDrinks.size() << "/" << amountDrinks;
+			cout << "\t'Magic' drinks: " << player->getCollectedDrinks()->size() << "/" << amountDrinks;
 			break;
 		case 4:
 			cout << "\tPress F to drink (FOV + 1)";
 			break;
 		case 6:
-			cout << "\tPlayer FOV: " << player->fov << " fields";
+			cout << "\tPlayer FOV: " << player->getFov() << " fields";
 			break;
+		/*case 7:
+			cout << "\tPlayer: " << player->getCurrent()->row << "  " << player->getCurrent()->column;
+			break;
+		case 8:
+			cout << "\tStart: " << this->getStart()->row << "  " << this->getStart()->column;
+			break;
+		case 9:
+			cout << "\tEnd: " << this->getEnd()->row << "  " << this->getEnd()->column;
+			break;*/
 		}
 			cout << endl;
 		}
-
-	for (auto drink : drinks)
-		cout << drink->row << "-" << drink->column << "-" << drink->collected << " | ";
 }
 
 Maze::~Maze(){}
@@ -139,10 +151,8 @@ void Maze::generateMaze() {
 			path.pop_back();
 		}
 		/*	If you returned to the start field finish generating	*/
-		else {
-			start->type = '@';
+		else
 			break;
-		}
 	} while (true);
 
 	/*	Finding finish field on the edge of maze	*/
@@ -173,4 +183,113 @@ void Maze::generateMaze() {
 	/*	Spawning drinks		*/
 	for (int drink = 0; drink < amountDrinks; ++drink)
 		drinks.push_back(new Alcohol(this));
+}
+
+void Maze::saveField(ofstream* ofs, Field* field) {
+	ofs->write((char*)&field->row, sizeof(int));
+	ofs->write((char*)&field->column, sizeof(int));
+	ofs->write((char*)&field->steps, sizeof(int));
+	ofs->write((char*)&field->type, sizeof(char));
+	ofs->write((char*)&field->seen, sizeof(bool));
+}
+
+Field* Maze::loadField(ifstream* ifs) {
+	Field* field = new Field();
+	ifs->read((char*)&field->row, sizeof(int));
+	ifs->read((char*)&field->column, sizeof(int));
+	ifs->read((char*)&field->steps, sizeof(int));
+	ifs->read((char*)&field->type, sizeof(char));
+	ifs->read((char*)&field->seen, sizeof(bool));
+
+	return field;
+}
+
+
+void Maze::saveMaze(ofstream* ofs) {
+	saveField(ofs, start);
+	saveField(ofs, end);
+
+	for (int i = 0; i < MSIZE; ++i)
+		for (int j = 0; j < MSIZE; ++j)
+			saveField(ofs, &fields[i][j]);
+
+	currentPage->save(ofs);
+	ofs->write((char*)&finished, sizeof(bool));
+
+	ofs->write((char*)&amountPages, sizeof(int));
+	ofs->write((char*)&amountDrinks, sizeof(int));
+	unsigned int size = drinks.size();
+	ofs->write(reinterpret_cast<const char *>(&size), sizeof(size));
+	for (unsigned int i = 0; i < size; ++i)
+		drinks[i]->save(ofs);
+}
+
+void Maze::loadMaze(ifstream* ifs) {
+	unsigned int size;
+
+	start = loadField(ifs);
+	end = loadField(ifs);
+
+	for (int i = 0; i < MSIZE; ++i)
+		for (int j = 0; j < MSIZE; ++j)
+			fields[i][j] = *(loadField(ifs));
+
+	currentPage->load(ifs);
+	ifs->read((char*)&finished, sizeof(bool));
+
+	ifs->read((char*)&amountPages, sizeof(int));
+	ifs->read((char*)&amountDrinks, sizeof(int));
+	ifs->read(reinterpret_cast<char *>(&size), sizeof(sizeof(drinks)));
+	drinks.resize(size);
+	for (unsigned int i = 0; i < size; ++i)
+		drinks[i]->load(ifs);
+}
+
+bool Maze::getFinished() {
+	return finished;
+}
+void Maze::setFinished(bool f) {
+	finished = f;
+}
+
+Field* Maze::getStart() {
+	return start;
+}
+
+Field* Maze::getEnd() {
+	return end;
+}
+vector<Field*> Maze::getPath() {
+	return path;
+}
+
+
+int Maze::getAmountPages() {
+	return amountPages;
+}
+
+int Maze::getAmountDrinks() {
+	return amountDrinks;
+}
+
+vector <Alcohol*> *Maze::getDrinks() {
+	return &drinks;
+}
+
+Page* Maze::getCurrentPage() {
+	return currentPage;
+}
+
+void Maze::setCurrentPage(Page* p) {
+	currentPage->setCollected(p->getCollected());
+	currentPage->setRow(p->getRow());
+	currentPage->setColumn(p->getColumn());
+}
+
+void Maze::setAmountPages(int p) {
+	amountPages = p;
+}
+
+void Maze::setAmountDrinks(int d) {
+	amountDrinks = d;
 }

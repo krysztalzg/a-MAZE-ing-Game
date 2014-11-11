@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <fstream>
 
 #define MSIZE 11
 
@@ -17,9 +18,9 @@ struct Field {
 };
 
 class Maze {
-public:
+private:
 	Field *start, *end;
-	Field fields[MSIZE][MSIZE];
+
 	vector<Field*> path;
 	bool finished;
 
@@ -27,10 +28,37 @@ public:
 	vector <Alcohol*> drinks;
 	Page* currentPage;
 
-	//void show(int, int, int);
+public:
+	Field fields[MSIZE][MSIZE];
+
+	bool getFinished();
+	void setFinished(bool);
+
+	Field** getFields();
+	Field* getStart();
+	Field* getEnd();
+	vector<Field*> getPath();
+
+	int getAmountPages();
+	int getAmountDrinks();
+
+	void setAmountPages(int);
+	void setAmountDrinks(int);
+
+	vector <Alcohol*> *getDrinks();
+	Page* getCurrentPage();
+	void setCurrentPage(Page*);
+
+
 	void show(Player*);
 	void findNeighbours(Field*);
 	void generateMaze();
+
+	void saveMaze(ofstream*);
+	void loadMaze(ifstream*);
+	void saveField(ofstream*, Field*);
+	Field* loadField(ifstream*);
+
 	Maze();
 	~Maze();
 };

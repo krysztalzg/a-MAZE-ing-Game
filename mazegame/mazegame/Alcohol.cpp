@@ -6,29 +6,30 @@
 
 Alcohol::Alcohol(Maze* maze) {
 	int r, col;
+
 	do {
 		r = rand() % MSIZE;
 		col = rand() % MSIZE;
-		for (auto drink : maze->drinks) {
-			if ((drink->column == col && drink->row == r) || (maze->currentPage->column == col && maze->currentPage->row == r)) {
+		for (auto drink : *maze->getDrinks()) {
+			if ((drink->getColumn() == col && drink->getRow() == r) || (maze->getCurrentPage()->getColumn() == col && maze->getCurrentPage()->getRow() == r)) {
 				col = r = 0;
 				break;
 			}
 		}
 	} while (maze->fields[r][col].type != ' ');
-	column = col;
-	row = r;
-	collected = false;
+	setColumn(col);
+	setRow(r);
+	setCollected(false);
 }
 
 void Alcohol::collect(Player* player, Maze* maze) {
-	player->collectedDrinks.push_back(this);
-	this->collected = true;
+	player->getCollectedDrinks()->push_back(this);
+	this->setCollected(true);
 }
 
 void Alcohol::drink(Player* player, Maze* maze) {
-	player->setFov(player->fov + 1);
-	maze->amountDrinks--;
+	player->setFov(player->getFov() + 1);
+	maze->setAmountDrinks(maze->getAmountDrinks() - 1);
 }
 
 Alcohol::~Alcohol() {}
