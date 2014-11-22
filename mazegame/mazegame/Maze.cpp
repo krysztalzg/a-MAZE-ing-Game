@@ -23,6 +23,10 @@ Maze::Maze() {
 			fields[i][j].row = i;
 			fields[i][j].column = j;
 			fields[i][j].visited = false;
+			if (i == 0 || i == MSIZE-1 || j == 0 || j == MSIZE-1)
+				fields[i][j].seen = true;
+			else
+				fields[i][j].seen = false;
 		}
 	}
 	amountDrinks = MSIZE / 5;
