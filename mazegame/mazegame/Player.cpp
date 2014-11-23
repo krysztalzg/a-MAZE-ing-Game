@@ -1,4 +1,5 @@
 #include <string>
+#include <SFML\Graphics.hpp>
 
 #include "Maze.h"
 #include "Page.h"
@@ -6,31 +7,40 @@
 #include "Player.h"
 
 using namespace std;
+using namespace sf;
 
 
-void Player::processMove(Maze* maze, int move) {
+void Player::processMove(Maze* maze, int move, View* camera, Sprite* bg) {
 	if (move == 1) {	//up
 		if (maze->fields[current->row - 1][current->column].type != '#') {
 			current->row--;
 			steps++;
+			camera->move(0,-50);
+			bg->move(0, 50);
 		}
 	}
 	else if (move == 2) {	//down
 		if (maze->fields[current->row + 1][current->column].type != '#') {
 			current->row++;
 			steps++;
+			camera->move(0, 50);
+			bg->move(0, -50);
 		}
 	}
 	else if (move == 3) {	//left
 		if (maze->fields[current->row][current->column - 1].type != '#') {
 			current->column--;
 			steps++;
+			camera->move(-50, 0);
+			bg->move(50, 0);
 		}
 	}
 	else if (move == 4) {	//right
 		if (maze->fields[current->row][current->column + 1].type != '#') {
 			current->column++;
 			steps++;
+			camera->move(50, 0);
+			bg->move(-50, 0);
 		}
 	}
 

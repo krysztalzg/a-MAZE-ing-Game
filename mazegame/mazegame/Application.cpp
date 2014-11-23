@@ -26,20 +26,27 @@ Application::Application() {
 	window->create(VideoMode(1280, 720), "a-MAZE-ing Game");
 	window->setFramerateLimit(60);
 
-	sprites[BG].setTexture(texManager->getTexture("background"));
-	sprites[BG].setTextureRect(IntRect(0, 0, 1280, 720));
+	//sprites[BG].setTexture(texManager->getTexture("background"));
+	//sprites[BG].setTextureRect(IntRect(0, 0, 2560, 1440));
+
 	sprites[TILE].setTexture(texManager->getTexture("tile"));
 	sprites[WALL].setTexture(texManager->getTexture("wall"));
 	sprites[FOG].setTexture(texManager->getTexture("fog"));
 	sprites[PLAYER].setTexture(texManager->getTexture("player"));
 	sprites[PAGE].setTexture(texManager->getTexture("page"));
 	sprites[DRINK].setTexture(texManager->getTexture("drink"));
+
+	camera = new View();
+	camera->setCenter(Vector2f(player->getCurrent()->column * 50, player->getCurrent()->row * 50));
+	camera->setSize(Vector2f(1280, 720));
+	window->setView(*camera);
+
 }
 
 void Application::drawGame() {
 	bool temp = false;
 	vector <Alcohol*> drinks = *maze->getDrinks();
-	window->draw(sprites[BG]);
+	//window->draw(sprites[BG]);
 
 		for (auto& rows : maze->fields) {
 			for (auto& f : rows) {
@@ -94,19 +101,19 @@ void Application::ApplicationMainLoop() {
 				switch (event.key.code) {
 				case Keyboard::Up:
 				case Keyboard::W:
-					player->processMove(maze, 1);
+					player->processMove(maze, 1,camera, &sprites[BG]);
 					break;
 				case Keyboard::Down:
 				case Keyboard::S:
-					player->processMove(maze, 2);
+					player->processMove(maze, 2, camera, &sprites[BG]);
 					break;
 				case Keyboard::Left:
 				case Keyboard::A:
-					player->processMove(maze, 3);
+					player->processMove(maze, 3, camera, &sprites[BG]);
 					break;
 				case Keyboard::Right:
 				case Keyboard::D:
-					player->processMove(maze, 4);
+					player->processMove(maze, 4, camera, &sprites[BG]);
 					break;
 				case Keyboard::F5:
 					saveGame();
@@ -137,7 +144,9 @@ void Application::ApplicationMainLoop() {
 				maze->show(player);
 			}
 		}
-		window->clear(Color::White);
+
+		window->setView(*camera);
+		window->clear(Color::Color(125,125,125,255));
 		drawGame();		
 		window->display();
 	}

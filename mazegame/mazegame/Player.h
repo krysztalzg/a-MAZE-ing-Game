@@ -1,6 +1,7 @@
 #pragma once
 #include "Maze.h"
 #include <fstream>
+#include <SFML\Graphics.hpp>
 
 class Alcohol;
 
@@ -24,7 +25,7 @@ public:
 	Field* getCurrent();
 	void setCurrent(Field*);
 
-	void processMove(Maze*, int);
+	void processMove(Maze*, int, sf::View*, sf::Sprite*);
 
 	void savePlayer(ofstream*);
 	void loadPlayer(ifstream*);

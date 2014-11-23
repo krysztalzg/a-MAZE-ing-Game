@@ -16,7 +16,7 @@ Alcohol::Alcohol(Maze* maze) {
 				break;
 			}
 		}
-	} while (maze->fields[r][col].type != ' ');
+	} while (maze->fields[r][col].type != ' ' && &maze->fields[r][col]!=maze->getStart());
 	setColumn(col);
 	setRow(r);
 	setCollected(false);

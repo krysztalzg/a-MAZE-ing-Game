@@ -23,7 +23,7 @@ Page::Page(Maze* maze) {
 
 	do
 		temp = &maze->fields[rand() % MSIZE][rand() % MSIZE];
-	while (temp->type != ' ');
+		while (temp->type != ' ' && temp != maze->getStart());
 
 	setRow(temp->row);
 	setColumn(temp->column);

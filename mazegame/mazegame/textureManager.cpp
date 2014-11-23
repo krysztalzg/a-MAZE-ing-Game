@@ -14,7 +14,7 @@ void textureManager::loadTexture(const string &name, string filename) {
 		tex->setRepeated(true);
 
 	if (!tex->loadFromFile("textures/" + filename)) {
-		cout << "Could not load" << endl;
+		system("pause");
 		exit(-1);
 	}
 	else
@@ -31,7 +31,7 @@ Texture& textureManager::getTexture(const string &texture) {
 }
 
 textureManager::textureManager() {
-	loadTexture("background", "bg2.png");
+	//loadTexture("background", "bg2.png");
 	loadTexture("tile", "tile.png");
 	loadTexture("fog", "fog.png");
 	loadTexture("player", "player.png");

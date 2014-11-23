@@ -20,6 +20,7 @@ public:
 	Sprite _background, _tile, _wall, _finish, _player, _page, _drink;
 	Sprite sprites[TEX_NUM];
 	RenderWindow* window;
+	View* camera;
 
 	void ApplicationMainLoop();
 	void drawGame();
