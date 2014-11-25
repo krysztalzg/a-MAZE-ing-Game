@@ -25,10 +25,12 @@ private:
 	bool finished;
 
 	int amountPages, amountDrinks;
+	//int size;
 	vector <Alcohol*> drinks;
 	Page* currentPage;
 
 public:
+	//Field** fields;
 	Field fields[MSIZE][MSIZE];
 
 	bool getFinished();
@@ -41,6 +43,7 @@ public:
 
 	int getAmountPages();
 	int getAmountDrinks();
+	//int getSize();
 
 	void setAmountPages(int);
 	void setAmountDrinks(int);

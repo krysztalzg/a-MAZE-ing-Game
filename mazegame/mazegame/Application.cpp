@@ -14,7 +14,7 @@
 using namespace std;
 using namespace sf;
 
-enum texs{ TILE, PLAYER, DRINK, PAGE, DOOR};
+enum texs{TILE, PLAYER, DRINK, PAGE, DOOR};
 
 Application::Application() {
 	maze = new Maze();
@@ -23,6 +23,22 @@ Application::Application() {
 	player->setCurrent(maze->getStart());
 
 	playerTex = rand()%8;
+
+	cout << "a-MAZE-ing Game" << endl << endl;
+	cout << "You are trapped in a maze." << endl << "To escape You need to find all keys and exit." << endl;
+	cout << "Everytime You pick key You forgot the structure of maze" << endl << "and have to explore again." << endl;
+	cout << "Also with every key picked Your sight worsen." << endl << "You'll find various magic drinks on your path through maze." << endl;
+	cout << "You can drink potion to improve Your sight." << endl << endl << endl;
+	cout << "Keyboard control:" << endl;
+	cout << "WSAD/Arrows: player movement" << endl;
+	cout << "1-9: changing player texture" << endl;
+	cout << "F: drink potion" << endl;
+	cout << "F5: save game" << endl;
+	cout << "F9: load game" << endl;
+	cout << "ESC: exit game" << endl;
+
+	system("pause");
+
 
 	window = new RenderWindow();	
 	window->create(VideoMode(1280, 720), "a-MAZE-ing Game");
@@ -65,10 +81,6 @@ void Application::drawGame() {
 						break;
 					}
 				}
-				/*else {
-					sprites[FOG].setPosition(Vector2f(f.column * 50, f.row * 50));
-					window->draw(sprites[FOG]);
-				}*/
 				//drawing page
 				if (maze->getCurrentPage()->getColumn() == f.column && maze->getCurrentPage()->getRow() == f.row && !maze->getCurrentPage()->getCollected() && f.seen) {
 					sprites[PAGE].setPosition(Vector2f(maze->getCurrentPage()->getColumn() * 50 + 12.5, maze->getCurrentPage()->getRow() * 50 + 12.5));
@@ -205,6 +217,8 @@ void Application::loadGame() {
 
 	maze->loadMaze(&ifs);
 	player->loadPlayer(&ifs);
+
+	camera->setCenter(Vector2f(player->getCurrent()->column * 50, player->getCurrent()->row * 50));
 
 	ifs.close();
 }

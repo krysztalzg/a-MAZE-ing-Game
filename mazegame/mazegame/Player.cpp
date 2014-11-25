@@ -11,7 +11,7 @@ using namespace sf;
 
 
 void Player::processMove(Maze* maze, int move, View* camera) {
-	if (move == 1) {	//up
+	if (move == 1) {		//up
 		if (maze->fields[current->row - 1][current->column].type != '#') {
 			current->row--;
 			steps++;

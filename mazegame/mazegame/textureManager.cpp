@@ -17,8 +17,6 @@ void textureManager::loadTexture(const string &name, string filename) {
 		system("pause");
 		exit(-1);
 	}
-	else
-		cout << "BG texture loaded" << endl;
 
 	tex->setSmooth(true);
 	this->textures[name] = *tex;
