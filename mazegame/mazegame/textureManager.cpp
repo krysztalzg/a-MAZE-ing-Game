@@ -31,13 +31,11 @@ Texture& textureManager::getTexture(const string &texture) {
 }
 
 textureManager::textureManager() {
-	//loadTexture("background", "bg2.png");
 	loadTexture("tile", "tile.png");
-	loadTexture("fog", "fog.png");
 	loadTexture("player", "player.png");
-	loadTexture("page", "page.png");
-	loadTexture("wall", "wall.png");
+	loadTexture("page", "key.png");
 	loadTexture("drink", "drink.png");
+	loadTexture("door", "door.png");
 }
 
 textureManager::~textureManager() {}

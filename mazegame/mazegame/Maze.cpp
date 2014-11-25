@@ -31,7 +31,20 @@ Maze::Maze() {
 	}
 	amountDrinks = MSIZE / 5;
 	amountPages = MSIZE / 10;
+
 	generateMaze();
+	/*
+	for (auto& rows: fields)
+	for (auto& f : rows)
+		switch (f.type) {
+		case '#':
+			f.texNo = 0;
+			break;
+		case ' ':
+			f.texNo = 2;
+			break;
+	}
+	*/
 	finished = false;
 }
 
@@ -59,7 +72,6 @@ void Maze::findNeighbours(Field* field) {
 
 void Maze::show(Player* player) {
 	bool temp = false;
-
 	system("cls");
 	for (auto& rows : fields) {
 		for (auto& f : rows) {

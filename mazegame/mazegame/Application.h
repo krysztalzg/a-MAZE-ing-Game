@@ -16,6 +16,7 @@ public:
 	Player* player;
 	Maze* maze;
 	textureManager* texManager;
+	int playerTex;
 
 	Sprite _background, _tile, _wall, _finish, _player, _page, _drink;
 	Sprite sprites[TEX_NUM];

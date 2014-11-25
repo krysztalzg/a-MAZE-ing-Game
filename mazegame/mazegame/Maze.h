@@ -2,7 +2,7 @@
 #include <vector>
 #include <fstream>
 
-#define MSIZE 17
+#define MSIZE 13
 
 using namespace std;
 

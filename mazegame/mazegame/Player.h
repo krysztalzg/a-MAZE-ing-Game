@@ -25,7 +25,7 @@ public:
 	Field* getCurrent();
 	void setCurrent(Field*);
 
-	void processMove(Maze*, int, sf::View*, sf::Sprite*);
+	void processMove(Maze*, int, sf::View*);
 
 	void savePlayer(ofstream*);
 	void loadPlayer(ifstream*);

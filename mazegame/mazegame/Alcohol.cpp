@@ -6,7 +6,7 @@
 
 Alcohol::Alcohol(Maze* maze) {
 	int r, col;
-
+	texNo = rand() % 8;
 	do {
 		r = rand() % MSIZE;
 		col = rand() % MSIZE;
@@ -30,6 +30,11 @@ void Alcohol::collect(Player* player, Maze* maze) {
 void Alcohol::drink(Player* player, Maze* maze) {
 	player->setFov(player->getFov() + 1);
 	maze->setAmountDrinks(maze->getAmountDrinks() - 1);
+}
+
+
+int Alcohol::getTexNo() {
+	return texNo;
 }
 
 Alcohol::~Alcohol() {}
