@@ -2,12 +2,14 @@
 
 using namespace std;
 
+/* simple item serialization */
 void Item::save(ofstream* ofs) {
 	ofs->write((char*)&row, sizeof(int));
 	ofs->write((char*)&column, sizeof(int));
 	ofs->write((char*)&collected, sizeof(bool));
 }
 
+/* simple item deserialization */
 void Item::load(ifstream* ifs) {
 	ifs->read((char*)&row, sizeof(int));
 	ifs->read((char*)&column, sizeof(int));

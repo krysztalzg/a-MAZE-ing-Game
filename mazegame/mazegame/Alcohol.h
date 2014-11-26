@@ -2,6 +2,7 @@
 #include "Item.h"
 
 class Maze;
+struct Field;
 
 class Alcohol :	public Item {
 private:
@@ -12,7 +13,7 @@ public:
 
 	int getTexNo();
 
-	Alcohol(Maze* maze);
+	Alcohol(Maze* maze, Field*);
 	virtual ~Alcohol();
 };
 

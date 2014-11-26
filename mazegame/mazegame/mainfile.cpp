@@ -12,6 +12,7 @@ int main() {
 	Application* app = new Application();
 
 	app->ApplicationMainLoop();
+
 	system("pause");
 	return 0;
 }

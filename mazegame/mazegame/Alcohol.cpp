@@ -4,10 +4,10 @@
 #include "Player.h"
 
 
-Alcohol::Alcohol(Maze* maze) {
+Alcohol::Alcohol(Maze* maze, Field* playerField) {
 	int r, col;
-	texNo = rand() % 8;
-	do {
+	texNo = rand() % 8;							//randomizing texture of potion from eight possible
+	do {										//setting potion tile to random empty one
 		r = rand() % MSIZE;
 		col = rand() % MSIZE;
 		for (auto drink : *maze->getDrinks()) {
@@ -16,17 +16,19 @@ Alcohol::Alcohol(Maze* maze) {
 				break;
 			}
 		}
-	} while (maze->fields[r][col].type != ' ' && &maze->fields[r][col]!=maze->getStart());
-	setColumn(col);
+	} while (maze->fields[r][col].type != ' ' || col == playerField->column || r == playerField->row);
+	setColumn(col);								//setting starting values
 	setRow(r);
 	setCollected(false);
 }
 
+/* when potion is collected add it to players collection */
 void Alcohol::collect(Player* player, Maze* maze) {
 	player->getCollectedDrinks()->push_back(this);
 	this->setCollected(true);
 }
 
+/* drinking potion increase players field of view */
 void Alcohol::drink(Player* player, Maze* maze) {
 	player->setFov(player->getFov() + 1);
 	maze->setAmountDrinks(maze->getAmountDrinks() - 1);

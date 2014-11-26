@@ -11,45 +11,35 @@ using namespace std;
 
 
 Maze::Maze() {
-	for (int i = 0; i < MSIZE; i++) {
-		for (int j = 0; j < MSIZE; j++) {
-			if (i == 0 || j == 0 || i == (MSIZE-1) || j == (MSIZE-1))
-				fields[i][j].type = '#';
-			else if ((i % 2) != 0 && (j % 2) != 0)
-				fields[i][j].type = ' ';
-			else
-				fields[i][j].type = '#';
+	for (int i = 0; i < MSIZE; i++) {									//initializing types of maze 
+		for (int j = 0; j < MSIZE; j++) {								//tiles by this pattern
+			if (i == 0 || j == 0 || i == (MSIZE-1) || j == (MSIZE-1))	//(#-wall, _ - empty):
+				fields[i][j].type = '#';								//#######
+			else if ((i % 2) != 0 && (j % 2) != 0)						//# # # #
+				fields[i][j].type = ' ';								//#######
+			else														//# # # #
+				fields[i][j].type = '#';								//#######
 
 			fields[i][j].row = i;
 			fields[i][j].column = j;
 			fields[i][j].visited = false;
-			if (i == 0 || i == MSIZE-1 || j == 0 || j == MSIZE-1)
+			if (i == 0 || i == MSIZE-1 || j == 0 || j == MSIZE-1)		//edges of maze are always visible
 				fields[i][j].seen = true;
 			else
 				fields[i][j].seen = false;
 		}
 	}
+	/* ampunt of potions and pages in maze is based on it's size*/
 	amountDrinks = MSIZE / 5;
 	amountPages = MSIZE / 10;
 
+	/* executing maze generation algorith */
 	generateMaze();
-	/*
-	for (auto& rows: fields)
-	for (auto& f : rows)
-		switch (f.type) {
-		case '#':
-			f.texNo = 0;
-			break;
-		case ' ':
-			f.texNo = 2;
-			break;
-	}
-	*/
 	finished = false;
 }
 
 
-
+/* finding all empty and not visited tiles in 2 step neighbourhood*/
 void Maze::findNeighbours(Field* field) {
 	int col = field->column, row = field->row;
 
@@ -70,6 +60,7 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
+/* displaying maze in console, works the same as drawing done for testing before gui */
 void Maze::show(Player* player) {
 	bool temp = false;
 	system("cls");
@@ -81,16 +72,16 @@ void Maze::show(Player* player) {
 				finished || f.seen) {
 			if (player->getCurrent()->column == f.column && player->getCurrent()->row == f.row)
 				cout << '@';
-			else if (currentPage->getColumn() == f.column && currentPage->getRow() == f.row && !currentPage->getCollected())		// displaying page
+			else if (currentPage->getColumn() == f.column && currentPage->getRow() == f.row && !currentPage->getCollected())	// displaying page
 				cout << '!';
 			else {																								
 				for (auto drink : drinks)
-					if (drink->getColumn() == f.column && drink->getRow() == f.row && !drink->getCollected()) {				// if there's drink on field diplay it
+					if (drink->getColumn() == f.column && drink->getRow() == f.row && !drink->getCollected()) {					// if there's drink on field diplay it
 						cout << '^';
 						temp = true;
 						break;
 					}
-						if (!temp)																				// otherwise display normal field - wall or empty
+						if (!temp)																								// otherwise display normal field - wall or empty
 						cout << f.type;	
 						temp = false;
 			}
@@ -101,7 +92,7 @@ void Maze::show(Player* player) {
 			cout << ' ';
 		}
 
-		/*	Disaplying statiscitcs	*/
+		/* Disaplying statiscitcs */
 		switch (rows[0].row) {
 		case 0:
 			cout << "\tShortest way: " << end->steps;
@@ -112,21 +103,12 @@ void Maze::show(Player* player) {
 		case 3:
 			cout << "\t'Magic' drinks: " << player->getCollectedDrinks()->size() << "/" << amountDrinks;
 			break;
-		case 4:
-			cout << "\tPress F to drink (FOV + 1)";
-			break;
-		case 6:
+		case 5:
 			cout << "\tPlayer FOV: " << player->getFov() << " fields";
 			break;
-		/*case 7:
+		case 6:
 			cout << "\tPlayer: " << player->getCurrent()->row << "  " << player->getCurrent()->column;
 			break;
-		case 8:
-			cout << "\tStart: " << this->getStart()->row << "  " << this->getStart()->column;
-			break;
-		case 9:
-			cout << "\tEnd: " << this->getEnd()->row << "  " << this->getEnd()->column;
-			break;*/
 		}
 			cout << endl;
 		}
@@ -138,7 +120,7 @@ Maze::~Maze(){}
 void Maze::generateMaze() {
 	Field* current;
 	Field* next;
-	/*	Finfing starting field	*/
+	/* Finfing starting field */
 	do
 	start = &fields[rand() % MSIZE][rand() % MSIZE];
 	while (start->type != ' ');
@@ -146,11 +128,11 @@ void Maze::generateMaze() {
 	start->visited = true;
 
 	current = start;
-	/*	Generating maze with DFS algorithm	*/
+	/* Generating maze with DFS algorithm */
 	do {
 		current->visited = true;
 		findNeighbours(current);
-		/*	If field have unvisited neighbour, create connection between them	*/
+		/* If field have unvisited neighbour, create connection between them */
 		if (!current->neighbours.empty()) {
 			next = current->neighbours[rand() % current->neighbours.size()];
 			fields[(current->row + next->row) / 2][(current->column + next->column) / 2].type = ' ';
@@ -161,17 +143,17 @@ void Maze::generateMaze() {
 			current->neighbours.clear();
 			current = next;
 		}
-		/*	Other way go to previous field	*/
+		/* Other way go to previous field */
 		else if (!path.empty()) {
 			current = path.back();
 			path.pop_back();
 		}
-		/*	If you returned to the start field finish generating	*/
+		/* If you returned to the start field finish generating */
 		else
 			break;
 	} while (true);
 
-	/*	Finding finish field on the edge of maze	*/
+	/* Finding finish field on the edge of maze */
 	do
 		end = &fields[rand() % MSIZE][rand() % MSIZE];
 	while (!(end->type == ' ') || !(end->row == 1 || end->column == 1 || end->row == (MSIZE - 2) || end->column == (MSIZE - 2)));
@@ -193,14 +175,15 @@ void Maze::generateMaze() {
 		end->steps = fields[end->row][MSIZE - 2].steps + 1;
 	}
 
-	/*	Spawning 1st page	*/
-	currentPage = new Page(this);
+	/* Spawning 1st page */
+	currentPage = new Page(this,start);
 
-	/*	Spawning drinks		*/
+	/* Spawning drinks */
 	for (int drink = 0; drink < amountDrinks; ++drink)
-		drinks.push_back(new Alcohol(this));
+		drinks.push_back(new Alcohol(this,start));
 }
 
+/* simple field serialization */
 void Maze::saveField(ofstream* ofs, Field* field) {
 	ofs->write((char*)&field->row, sizeof(int));
 	ofs->write((char*)&field->column, sizeof(int));
@@ -209,6 +192,7 @@ void Maze::saveField(ofstream* ofs, Field* field) {
 	ofs->write((char*)&field->seen, sizeof(bool));
 }
 
+/* simple field deserialization */
 Field* Maze::loadField(ifstream* ifs) {
 	Field* field = new Field();
 	ifs->read((char*)&field->row, sizeof(int));
@@ -221,6 +205,7 @@ Field* Maze::loadField(ifstream* ifs) {
 }
 
 
+/* simple maze serialization */
 void Maze::saveMaze(ofstream* ofs) {
 	saveField(ofs, start);
 	saveField(ofs, end);
@@ -240,6 +225,7 @@ void Maze::saveMaze(ofstream* ofs) {
 		drinks[i]->save(ofs);
 }
 
+/* simple maze deserialization */
 void Maze::loadMaze(ifstream* ifs) {
 	unsigned int size;
 

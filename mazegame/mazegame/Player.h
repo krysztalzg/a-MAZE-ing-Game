@@ -4,6 +4,7 @@
 #include <SFML\Graphics.hpp>
 
 class Alcohol;
+struct Field;
 
 class Player {
 private:
@@ -30,7 +31,7 @@ public:
 	void savePlayer(ofstream*);
 	void loadPlayer(ifstream*);
 
-	Player();
+	Player(Field*);
 	~Player();
 };
 

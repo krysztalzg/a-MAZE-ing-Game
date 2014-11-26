@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include <SFML\Graphics.hpp>
 
 #include "Maze.h"
@@ -9,49 +10,49 @@
 using namespace std;
 using namespace sf;
 
-
+/* moving player in one of direction if there is no wall*/
 void Player::processMove(Maze* maze, int move, View* camera) {
 	if (move == 1) {		//up
 		if (maze->fields[current->row - 1][current->column].type != '#') {
-			current->row--;
+			current = &maze->fields[current->row - 1][current->column];
 			steps++;
 			camera->move(0,-50);
 		}
 	}
 	else if (move == 2) {	//down
 		if (maze->fields[current->row + 1][current->column].type != '#') {
-			current->row++;
+			current = &maze->fields[current->row + 1][current->column];
 			steps++;
 			camera->move(0, 50);
 		}
 	}
 	else if (move == 3) {	//left
 		if (maze->fields[current->row][current->column - 1].type != '#') {
-			current->column--;
+			current = &maze->fields[current->row][current->column - 1];
 			steps++;
 			camera->move(-50, 0);
 		}
 	}
 	else if (move == 4) {	//right
 		if (maze->fields[current->row][current->column + 1].type != '#') {
-			current->column++;
+			current = &maze->fields[current->row][current->column + 1];
 			steps++;
 			camera->move(50, 0);
 		}
 	}
 
-	/*	Collecting page	*/
+	/* Collecting page	if it was on target tile */
 	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
 		maze->getCurrentPage()->collect(this, maze);
 		
-	/*	Collecting drink	*/
+	/* Collecting drink if there was one on target tile */
 	for (auto drink : *maze->getDrinks())
 		if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
 			drink->collect(this, maze);
 		
 }
 
-
+/* simple player serialization */
 void Player::savePlayer(ofstream* ofs) {
 	ofs->write((char*)&steps, sizeof(int));
 	ofs->write((char*)&fov, sizeof(int));
@@ -67,6 +68,7 @@ void Player::savePlayer(ofstream* ofs) {
 	ofs->write((char*)&collectedDrinks, sizeof(collectedDrinks));
 }
 
+/* simple player deserialization */
 void Player::loadPlayer(ifstream* ifs) {
 	streamsize size;
 	
@@ -91,9 +93,9 @@ void Player::setFov(int f) {
 		fov = 2;
 }
 
-
-Player::Player() {
-	current = new Field();
+/* creating player on starting field with calculated field of view */
+Player::Player(Field* start) {
+	current = start;
 	fov = MSIZE / 5;
 }
 
@@ -126,11 +128,12 @@ Field* Player::getCurrent() {
 }
 
 void Player::setCurrent(Field* c) {
-	current->row = c->row;
+	/*current->row = c->row;
 	current->column = c->column;
 	current->steps = c->steps;
 	current->type = c->type;
 	current->seen = c->seen;
 	current->visited = c->visited;
-	current->neighbours = c->neighbours;
+	current->neighbours = c->neighbours;*/
+	current = c;
 }
