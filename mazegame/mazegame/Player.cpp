@@ -52,6 +52,106 @@ void Player::processMove(Maze* maze, int move, View* camera) {
 		
 }
 
+void Player::move(Maze* maze, View* camera) {
+	if (speedY < 0) {		//up
+		if (maze->fields[current->row - 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
+			y += speedY;
+			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
+				current = &maze->fields[current->row - 1][current->column];
+			
+			camera->move(0, -speedY);
+		}
+	}
+	else if (speedY > 0) {	//down
+		if (maze->fields[current->row + 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
+			y += speedY;
+			if (maze->fields[current->row + 1][current->column].row * 50.f == y)
+				current = &maze->fields[current->row + 1][current->column];
+			camera->move(0, -speedY);
+		}
+	}
+	if (speedX < 0) {	//left
+		if (maze->fields[current->row][current->column - 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
+			x += speedX;
+			if (maze->fields[current->row][current->column - 1].column * 50.f == x)
+				current = &maze->fields[current->row][current->column - 1];
+			
+			camera->move(-speedX, 0);
+		}
+	}
+	else if (speedX > 0) {	//right
+		if (maze->fields[current->row][current->column + 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
+			x += speedX;
+			if (maze->fields[current->row][current->column + 1].column * 50.f == x)
+				current = &maze->fields[current->row][current->column + 1];
+			
+			camera->move(-speedX, 0);
+		}
+	}
+
+	/* Collecting page	if it was on target tile */
+	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
+		maze->getCurrentPage()->collect(this, maze);
+
+	/* Collecting drink if there was one on target tile */
+	for (auto drink : *maze->getDrinks())
+	if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
+		drink->collect(this, maze);
+}
+
+
+void Player::move2(Maze* maze, View* camera) {
+	if (speedY < 0) {		//up
+		for (auto& rows:maze->fields)
+		for (auto& f : rows){
+
+		}
+
+		if (maze->fields[current->row - 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
+			y += speedY;
+			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
+				current = &maze->fields[current->row - 1][current->column];
+
+			camera->move(0, -speedY);
+		}
+	}
+	else if (speedY > 0) {	//down
+		if (maze->fields[current->row + 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
+			y += speedY;
+			if (maze->fields[current->row + 1][current->column].row * 50.f == y)
+				current = &maze->fields[current->row + 1][current->column];
+			camera->move(0, -speedY);
+		}
+	}
+	if (speedX < 0) {	//left
+		if (maze->fields[current->row][current->column - 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
+			x += speedX;
+			if (maze->fields[current->row][current->column - 1].column * 50.f == x)
+				current = &maze->fields[current->row][current->column - 1];
+
+			camera->move(-speedX, 0);
+		}
+	}
+	else if (speedX > 0) {	//right
+		if (maze->fields[current->row][current->column + 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
+			x += speedX;
+			if (maze->fields[current->row][current->column + 1].column * 50.f == x)
+				current = &maze->fields[current->row][current->column + 1];
+
+			camera->move(-speedX, 0);
+		}
+	}
+
+	/* Collecting page	if it was on target tile */
+	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
+		maze->getCurrentPage()->collect(this, maze);
+
+	/* Collecting drink if there was one on target tile */
+	for (auto drink : *maze->getDrinks())
+	if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
+		drink->collect(this, maze);
+}
+
 /* simple player serialization */
 void Player::savePlayer(ofstream* ofs) {
 	ofs->write((char*)&steps, sizeof(int));
@@ -96,9 +196,44 @@ void Player::setFov(int f) {
 /* creating player on starting field with calculated field of view */
 Player::Player(Field* start) {
 	current = start;
+	x = start->column * 50.0f;
+	y = start->row * 50.0f;
+	speedX = 0;
+	speedY = 0;
 	fov = MSIZE / 5;
 }
 
+int Player::getSpeedX() {
+	return speedX;
+}
+
+int Player::getSpeedY() {
+	return speedY;
+}
+
+void Player::setSpeedX(int speed) {
+	speedX = speed;
+}
+
+void Player::setSpeedY(int speed) {
+	speedY = speed;
+}
+
+int Player::getX() {
+	return x;
+}
+
+int Player::getY() {
+	return y;
+}
+
+void Player::setX(int _x) {
+	x = _x;
+}
+
+void Player::setY(int _y) {
+	y = _y;
+}
 
 Player::~Player() {
 }
@@ -126,14 +261,7 @@ vector <Alcohol*> *Player::getCollectedDrinks() {
 Field* Player::getCurrent() {
 	return current;
 }
-
+/*
 void Player::setCurrent(Field* c) {
-	/*current->row = c->row;
-	current->column = c->column;
-	current->steps = c->steps;
-	current->type = c->type;
-	current->seen = c->seen;
-	current->visited = c->visited;
-	current->neighbours = c->neighbours;*/
 	current = c;
-}
+}*/

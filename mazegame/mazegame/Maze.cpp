@@ -107,7 +107,7 @@ void Maze::show(Player* player) {
 			cout << "\tPlayer FOV: " << player->getFov() << " fields";
 			break;
 		case 6:
-			cout << "\tPlayer: " << player->getCurrent()->row << "  " << player->getCurrent()->column;
+			cout << "\tPlayer: " << player->getSpeedX() << "  " << player->getSpeedY();
 			break;
 		}
 			cout << endl;

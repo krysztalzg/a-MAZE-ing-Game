@@ -16,6 +16,8 @@ void Page::collect(Player* player, Maze* maze) {
 		for (int j = 0; j < MSIZE; ++j)								// visibility of all fields is reseted
 			if (i != 0 && i != MSIZE - 1 && j != 0 && j != MSIZE - 1)
 			maze->fields[i][j].seen = false;
+
+			maze->getEnd()->seen = false;
 }
 
 

@@ -101,14 +101,20 @@ void Application::drawGame() {
 			}
 		}
 		/* draw player */
-		sprites[PLAYER].setTextureRect(IntRect(30*playerTex, 0, 30, 50));
-		sprites[PLAYER].setPosition(Vector2f(player->getCurrent()->column * 50.0f + 12.5f, player->getCurrent()->row * 50.0f));
+		sprites[PLAYER].setTextureRect(IntRect(30 * playerTex, 0, 30, 50));
+		sprites[PLAYER].setPosition(Vector2f(player->getX() + 12.5f, player->getY()));
+		camera->setCenter(Vector2f(player->getX() + 12.5f, player->getY()));
 		window->draw(sprites[PLAYER]);
 
 		/* draw exit if open and was seen after opening */
 		if (maze->getEnd()->type == ' ' && maze->getEnd()->seen) {
 			sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
 			window->draw(sprites[DOOR]);
+		}
+		else if (!maze->getEnd()->seen){
+			sprites[TILE].setTextureRect(IntRect(0, 0, 50, 50));
+			sprites[TILE].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
+			window->draw(sprites[TILE]);
 		}
 }
 
@@ -118,7 +124,8 @@ void Application::ApplicationMainLoop() {
 	string temp;
 	maze->show(player);
 
-	while (window->isOpen()) {							//looping until app window is closed
+	while (window->isOpen()) {
+		player->move(maze, camera);						//looping until app window is closed
 		while (window->pollEvent(event)) {				//polling next event
 			if (event.type == Event::KeyReleased) {		//if it was keyboard key released
 				switch (event.key.code) {				//executing appropriate action to key pressed
@@ -155,19 +162,23 @@ void Application::ApplicationMainLoop() {
 					break;
 				case Keyboard::Up:							//WSAD and Arrows control players movement
 				case Keyboard::W:
-					player->processMove(maze, 1, camera);
+					//player->processMove(maze, 1, camera);
+					player->setSpeedY(0);
 					break;
 				case Keyboard::Down:
 				case Keyboard::S:
-					player->processMove(maze, 2, camera);
+					//player->processMove(maze, 2, camera);
+					player->setSpeedY(0);
 					break;
 				case Keyboard::Left:
 				case Keyboard::A:
-					player->processMove(maze, 3, camera);
+					//player->processMove(maze, 3, camera);
+					player->setSpeedX(0);
 					break;
 				case Keyboard::Right:
 				case Keyboard::D:
-					player->processMove(maze, 4, camera);
+					//player->processMove(maze, 4, camera);
+					player->setSpeedX(0);
 					break;
 				case Keyboard::F5:							//F5, F9 is saving and loading game
 					saveGame();
@@ -200,6 +211,26 @@ void Application::ApplicationMainLoop() {
 				}
 				/* displaying game in console (done for testing before gui etc.) */
 				maze->show(player);							
+			}
+			else if (event.type == Event::KeyPressed) {
+				switch (event.key.code) {
+				case Keyboard::Up:
+				case Keyboard::W:
+					player->setSpeedY(-5);
+					break;
+				case Keyboard::Down:
+				case Keyboard::S:
+					player->setSpeedY(5);
+					break;
+				case Keyboard::Left:
+				case Keyboard::A:
+					player->setSpeedX(-5);
+					break;
+				case Keyboard::Right:
+				case Keyboard::D:
+					player->setSpeedX(5);
+					break;
+				}
 			}
 		}
 		/* setting perspective and drawing whole game */
