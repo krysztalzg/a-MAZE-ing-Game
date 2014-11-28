@@ -125,7 +125,8 @@ void Application::ApplicationMainLoop() {
 	maze->show(player);
 
 	while (window->isOpen()) {
-		player->move(maze, camera);						//looping until app window is closed
+		//player->move(maze, camera);
+		player->move2(maze, camera);						//looping until app window is closed
 		while (window->pollEvent(event)) {				//polling next event
 			if (event.type == Event::KeyReleased) {		//if it was keyboard key released
 				switch (event.key.code) {				//executing appropriate action to key pressed
