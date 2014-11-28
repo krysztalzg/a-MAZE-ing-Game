@@ -36,6 +36,10 @@ textureManager::textureManager() {
 	loadTexture("page", "key.png");
 	loadTexture("drink", "drink.png");
 	loadTexture("door", "door.png");
+
+	loadTexture("splash1", "splash1.png");
+	loadTexture("splash2", "splash2.png");
+	loadTexture("splash3", "splash3.png");
 }
 
 textureManager::~textureManager() {}

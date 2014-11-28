@@ -60,60 +60,6 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
-/* displaying maze in console, works the same as drawing done for testing before gui */
-void Maze::show(Player* player) {
-	bool temp = false;
-	system("cls");
-	for (auto& rows : fields) {
-		for (auto& f : rows) {
-			if ((abs(player->getCurrent()->column - f.column) < player->getFov() && abs(player->getCurrent()->row - f.row) < player->getFov()) ||
-				(abs(player->getCurrent()->column - f.column) < player->getFov() - 1 && abs(player->getCurrent()->row - f.row) < player->getFov() + 1) ||
-				(abs(player->getCurrent()->column - f.column) < player->getFov() + 1 && abs(player->getCurrent()->row - f.row) < player->getFov() - 1) ||
-				finished || f.seen) {
-			if (player->getCurrent()->column == f.column && player->getCurrent()->row == f.row)
-				cout << '@';
-			else if (currentPage->getColumn() == f.column && currentPage->getRow() == f.row && !currentPage->getCollected())	// displaying page
-				cout << '!';
-			else {																								
-				for (auto drink : drinks)
-					if (drink->getColumn() == f.column && drink->getRow() == f.row && !drink->getCollected()) {					// if there's drink on field diplay it
-						cout << '^';
-						temp = true;
-						break;
-					}
-						if (!temp)																								// otherwise display normal field - wall or empty
-						cout << f.type;	
-						temp = false;
-			}
-
-			f.seen = true;
-			}
-			else
-			cout << ' ';
-		}
-
-		/* Disaplying statiscitcs */
-		switch (rows[0].row) {
-		case 0:
-			cout << "\tShortest way: " << end->steps;
-			break;
-		case 2:
-			cout << "\tPages: " << player->getCollectedPages() << "/" << amountPages;
-			break;
-		case 3:
-			cout << "\t'Magic' drinks: " << player->getCollectedDrinks()->size() << "/" << amountDrinks;
-			break;
-		case 5:
-			cout << "\tPlayer FOV: " << player->getFov() << " fields";
-			break;
-		case 6:
-			cout << "\tPlayer: " << player->getSpeedX() << "  " << player->getSpeedY();
-			break;
-		}
-			cout << endl;
-		}
-}
-
 Maze::~Maze(){}
 
 

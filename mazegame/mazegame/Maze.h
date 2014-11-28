@@ -52,8 +52,6 @@ public:
 	Page* getCurrentPage();
 	void setCurrentPage(Page*);
 
-
-	void show(Player*);
 	void findNeighbours(Field*);
 	void generateMaze();
 

@@ -24,26 +24,14 @@ Application::Application() {
 
 	playerTex = rand()%8;						//players texture is randomly chosen from possible ones
 
-	cout << endl;
-	cout << "a-MAZE-ing Game" << endl << endl;
-	cout << "You are trapped in a maze." << endl << "To escape You need to find all keys and exit." << endl;
-	cout << "Everytime You pick key You forgot the structure of maze" << endl << "and have to explore again." << endl;
-	cout << "Also with every key picked Your sight worsen." << endl << "You'll find various magic drinks on your path through maze." << endl;
-	cout << "You can drink potion to improve Your sight." << endl << endl << endl;
-	cout << "Keyboard control:" << endl;
-	cout << "WSAD/Arrows: player movement" << endl;
-	cout << "1-9: changing player texture" << endl;
-	cout << "F: drink potion" << endl;
-	cout << "F5: save game" << endl;
-	cout << "F9: load game" << endl;
-	cout << "ESC: exit game" << endl << endl;
-
-	system("pause");
-
 	/* creating window with given size, title and framerate */
 	window = new RenderWindow();	
 	window->create(VideoMode(1280, 720), "a-MAZE-ing Game");
 	window->setFramerateLimit(60);
+
+	drawSplash("splash1");
+	drawSplash("splash2");
+	drawSplash("splash3");
 
 	/* connecting loaded textures with sprites */
 	sprites[TILE].setTexture(texManager->getTexture("tile"));
@@ -58,7 +46,6 @@ Application::Application() {
 	camera->setCenter(Vector2f(player->getCurrent()->column * 50.0f, player->getCurrent()->row * 50.0f));
 	camera->setSize(Vector2f(1280, 720));
 	window->setView(*camera);
-
 }
 
 void Application::drawGame() {
@@ -102,7 +89,7 @@ void Application::drawGame() {
 		}
 		/* draw player */
 		sprites[PLAYER].setTextureRect(IntRect(30 * playerTex, 0, 30, 50));
-		sprites[PLAYER].setPosition(Vector2f(player->getX() + 12.5f, player->getY()));
+		sprites[PLAYER].setPosition(Vector2f(player->getX() + 12.5f, (float)player->getY()));
 		window->draw(sprites[PLAYER]);
 
 		/* draw exit if open and was seen after opening */
@@ -121,7 +108,6 @@ void Application::drawGame() {
 void Application::ApplicationMainLoop() {
 	Event event;
 	string temp;
-	maze->show(player);
 
 	while (window->isOpen()) {							//looping until app window is closed
 		while (window->pollEvent(event)) {				//polling next event
@@ -158,34 +144,46 @@ void Application::ApplicationMainLoop() {
 					while (temp == playerTex);
 					playerTex = temp;
 					break;
+
+
+				case Keyboard::Equal:						//steering view zoom
+					camera->zoom(1.5f);
+					break;
+				case Keyboard::Dash:
+					camera->zoom(0.5f);
+					break;
+
+
 				case Keyboard::Up:							//WSAD and Arrows control players movement
 				case Keyboard::W:
 					if (!Keyboard::isKeyPressed(Keyboard::Down) && !Keyboard::isKeyPressed(Keyboard::S))
 						player->setSpeedY(0);
-					else
+					else if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S))
 						player->setSpeedY(5);
 					break;
 				case Keyboard::Down:
 				case Keyboard::S:
 					if (!Keyboard::isKeyPressed(Keyboard::Up) && !Keyboard::isKeyPressed(Keyboard::W))
 						player->setSpeedY(0);
-					else
+					else if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W))
 						player->setSpeedY(-5);
 					break;
 				case Keyboard::Left:
 				case Keyboard::A:
 					if (!Keyboard::isKeyPressed(Keyboard::Right) && !Keyboard::isKeyPressed(Keyboard::D))
 						player->setSpeedX(0);
-					else
+					else if(Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D))
 						player->setSpeedX(5);
 					break;
 				case Keyboard::Right:
 				case Keyboard::D:
 					if (!Keyboard::isKeyPressed(Keyboard::Left) && !Keyboard::isKeyPressed(Keyboard::A))
 						player->setSpeedX(0);
-					else
+					else if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A))
 						player->setSpeedY(-5);
 					break;
+
+
 				case Keyboard::F5:							//F5, F9 is saving and loading game
 					saveGame();
 					cout << endl << "Game saved" << endl;
@@ -193,10 +191,11 @@ void Application::ApplicationMainLoop() {
 					break;
 				case Keyboard::F9:
 						loadGame();
-						maze->show(player);
 						cout << endl << "Game loaded" << endl;
 						sleep(seconds(0.5f));
 					break;
+
+
 				case Keyboard::F:							//F for drinkink potions
 					if (player->getCollectedDrinks()->size() > 0) {
 						player->getCollectedDrinks()->back()->drink(player, maze);
@@ -206,7 +205,8 @@ void Application::ApplicationMainLoop() {
 				case Keyboard::Escape:						//ESC close app window
 					window->close();
 					break;
-				}											
+				}			
+
 				/* when player step into finish field app window is closing and displaying moves statistic in console */
 				if (player->getCurrent()->column == 0 || player->getCurrent()->column == MSIZE - 1 ||
 					player->getCurrent()->row == 0 || player->getCurrent()->row == MSIZE - 1) {
@@ -214,9 +214,7 @@ void Application::ApplicationMainLoop() {
 
 					maze->setFinished(true);
 					window->close();
-				}
-				/* displaying game in console (for testing before gui etc.) */
-				maze->show(player);							
+				}							
 			}
 			else if (event.type == Event::KeyPressed) {
 				switch (event.key.code) {
@@ -240,12 +238,17 @@ void Application::ApplicationMainLoop() {
 			}
 		}
 		/* updating whole game */
-		player->move2(maze, camera);
+		player->move(maze, camera);
 		window->setView(*camera);
 		window->clear(Color::Color(125,125,125,255));
 		drawGame();		
 		window->display();
 	}
+
+	if (maze->getFinished())
+		cout << "Congratualtion, maze finished with " << player->getSteps() << " steps with " << maze->getEnd()->steps << " steps shortest possible." << endl << endl << endl;
+	else
+		cout << "Maze not finished. " << player->getSteps() << " steps done with " << maze->getEnd()->steps << " steps shortest possible." << endl << endl << endl;
 }
 
 /* simple serialization of all app objects */
@@ -269,5 +272,19 @@ void Application::loadGame() {
 
 	ifs.close();
 }
+
+void Application::drawSplash(String name) {
+	Event event;
+	splash.setTexture(texManager->getTexture(name));
+	splash.setPosition(Vector2f(0, 0));
+	window->draw(splash);
+	window->display();
+
+	do {
+		window->pollEvent(event);
+	} while (event.type != Event::KeyReleased || event.key.code != Keyboard::Return);
+
+}
+
 
 Application::~Application() {}

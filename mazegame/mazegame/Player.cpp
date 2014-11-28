@@ -11,96 +11,7 @@ using namespace std;
 using namespace sf;
 
 /* moving player in one of direction if there is no wall*/
-void Player::processMove(Maze* maze, int move, View* camera) {
-	if (move == 1) {		//up
-		if (maze->fields[current->row - 1][current->column].type != '#') {
-			current = &maze->fields[current->row - 1][current->column];
-			steps++;
-			camera->move(0,-50);
-		}
-	}
-	else if (move == 2) {	//down
-		if (maze->fields[current->row + 1][current->column].type != '#') {
-			current = &maze->fields[current->row + 1][current->column];
-			steps++;
-			camera->move(0, 50);
-		}
-	}
-	else if (move == 3) {	//left
-		if (maze->fields[current->row][current->column - 1].type != '#') {
-			current = &maze->fields[current->row][current->column - 1];
-			steps++;
-			camera->move(-50, 0);
-		}
-	}
-	else if (move == 4) {	//right
-		if (maze->fields[current->row][current->column + 1].type != '#') {
-			current = &maze->fields[current->row][current->column + 1];
-			steps++;
-			camera->move(50, 0);
-		}
-	}
-
-	/* Collecting page	if it was on target tile */
-	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
-		maze->getCurrentPage()->collect(this, maze);
-		
-	/* Collecting drink if there was one on target tile */
-	for (auto drink : *maze->getDrinks())
-		if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
-			drink->collect(this, maze);
-		
-}
-
 void Player::move(Maze* maze, View* camera) {
-	if (speedY < 0) {		//up
-		if (maze->fields[current->row - 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
-			y += speedY;
-			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
-				current = &maze->fields[current->row - 1][current->column];
-			
-			camera->move(0, -speedY);
-		}
-	}
-	else if (speedY > 0) {	//down
-		if (maze->fields[current->row + 1][current->column].type != '#' && x == maze->fields[current->row][current->column].column * 50.0f) {
-			y += speedY;
-			if (maze->fields[current->row + 1][current->column].row * 50.f == y)
-				current = &maze->fields[current->row + 1][current->column];
-			camera->move(0, -speedY);
-		}
-	}
-	if (speedX < 0) {	//left
-		if (maze->fields[current->row][current->column - 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
-			x += speedX;
-			if (maze->fields[current->row][current->column - 1].column * 50.f == x)
-				current = &maze->fields[current->row][current->column - 1];
-			
-			camera->move(-speedX, 0);
-		}
-	}
-	else if (speedX > 0) {	//right
-		if (maze->fields[current->row][current->column + 1].type != '#' && y == maze->fields[current->row][current->column].row * 50.0f) {
-			x += speedX;
-			if (maze->fields[current->row][current->column + 1].column * 50.f == x)
-				current = &maze->fields[current->row][current->column + 1];
-			
-			camera->move(-speedX, 0);
-		}
-	}
-
-	/* Collecting page	if it was on target tile */
-	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
-		maze->getCurrentPage()->collect(this, maze);
-
-	/* Collecting drink if there was one on target tile */
-	for (auto drink : *maze->getDrinks())
-	if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
-		drink->collect(this, maze);
-}
-
-
-void Player::move2(Maze* maze, View* camera) {
 	if (speedY < 0)  {			//up
 		if (((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') && y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f)) && (x == maze->fields[current->row][current->column].column * 50.0f)) {
 			y += speedY;
@@ -129,6 +40,7 @@ void Player::move2(Maze* maze, View* camera) {
 				current = &maze->fields[current->row][current->column + 1];
 		}
 	}
+	/* Centering camera on player */
 	camera->setCenter(Vector2f(x + 12.5f, y));
 	
 	/* Collecting page	if it was on target tile */
@@ -254,7 +166,3 @@ vector <Alcohol*> *Player::getCollectedDrinks() {
 Field* Player::getCurrent() {
 	return current;
 }
-/*
-void Player::setCurrent(Field* c) {
-	current = c;
-}*/

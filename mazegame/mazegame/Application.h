@@ -12,13 +12,15 @@ class textureManager;
 using namespace sf;
 
 class Application {
+private:
+	int phase;		//0-3 splashes, 4 game
 public:
 	Player* player;
 	Maze* maze;
 	textureManager* texManager;
 	int playerTex;
 
-	Sprite _background, _tile, _wall, _finish, _player, _page, _drink;
+	Sprite splash;
 	Sprite sprites[TEX_NUM];
 	RenderWindow* window;
 	View* camera;
@@ -27,6 +29,7 @@ public:
 	void drawGame();
 	void saveGame();
 	void loadGame();
+	void drawSplash(String);
 
 	Application();
 	~Application();
