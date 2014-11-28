@@ -101,13 +101,11 @@ void Player::move(Maze* maze, View* camera) {
 
 
 void Player::move2(Maze* maze, View* camera) {
-	if (speedY < 0) {			//up
+	if (speedY < 0)  {			//up
 		if (((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') && y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f)) && (x == maze->fields[current->row][current->column].column * 50.0f)) {
 			y += speedY;
 			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
 				current = &maze->fields[current->row - 1][current->column];
-
-			//camera->move(0, -speedY);
 		}
 	}
 	else if (speedY > 0) {	//down
@@ -115,7 +113,6 @@ void Player::move2(Maze* maze, View* camera) {
 			y += speedY;
 			if (maze->fields[current->row + 1][current->column].row * 50.f == y)
 				current = &maze->fields[current->row + 1][current->column];
-			//camera->move(0, -speedY);
 		}
 	}
 	if (speedX < 0) {	//left
@@ -123,8 +120,6 @@ void Player::move2(Maze* maze, View* camera) {
 			x += speedX;
 			if (maze->fields[current->row][current->column - 1].column * 50.f == x)
 				current = &maze->fields[current->row][current->column - 1];
-
-			//camera->move(-speedX, 0);
 		}
 	}
 	else if (speedX > 0) {	//right
@@ -132,11 +127,9 @@ void Player::move2(Maze* maze, View* camera) {
 			x += speedX;
 			if (maze->fields[current->row][current->column + 1].column * 50.f == x)
 				current = &maze->fields[current->row][current->column + 1];
-
-			//camera->move(-speedX, 0);
 		}
 	}
-	//Vector2f viewCenter = camera->getCenter();
+	camera->setCenter(Vector2f(x + 12.5f, y));
 	
 	/* Collecting page	if it was on target tile */
 	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
@@ -152,6 +145,8 @@ void Player::move2(Maze* maze, View* camera) {
 void Player::savePlayer(ofstream* ofs) {
 	ofs->write((char*)&steps, sizeof(int));
 	ofs->write((char*)&fov, sizeof(int));
+	ofs->write((char*)&x, sizeof(int));
+	ofs->write((char*)&y, sizeof(int));
 	ofs->write((char*)&collectedPages, sizeof(int));
 
 	ofs->write((char*)&current->row, sizeof(int));
@@ -170,6 +165,8 @@ void Player::loadPlayer(ifstream* ifs) {
 	
 	ifs->read((char*)&steps, sizeof(int));
 	ifs->read((char*)&fov, sizeof(int));
+	ifs->read((char*)&x, sizeof(int));
+	ifs->read((char*)&y, sizeof(int));
 	ifs->read((char*)&collectedPages, sizeof(int));
 
 	ifs->read((char*)&current->row, sizeof(int));
