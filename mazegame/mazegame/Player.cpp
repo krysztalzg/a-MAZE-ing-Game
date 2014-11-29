@@ -12,46 +12,62 @@ using namespace sf;
 
 /* moving player in one of direction if there is no wall*/
 void Player::move(Maze* maze, View* camera) {
-	if (speedY < 0)  {			//up
-		if (((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') && y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f)) && (x == maze->fields[current->row][current->column].column * 50.0f)) {
-			y += speedY;
+	//up
+	if ((Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W)) &&
+		((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') &&
+		y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f)) &&
+		(x == maze->fields[current->row][current->column].column * 50.0f)) {
+			y -= speedY;
 			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
 				current = &maze->fields[current->row - 1][current->column];
-		}
 	}
-	else if (speedY > 0) {	//down
-		if (((maze->fields[current->row + 1][current->column].type != '#') || ((maze->fields[current->row + 1][current->column].type == '#') && y + 50.0f < maze->fields[current->row + 1][current->column].row * 50.0f)) && (x == maze->fields[current->row][current->column].column * 50.0f)) {
-			y += speedY;
-			if (maze->fields[current->row + 1][current->column].row * 50.f == y)
-				current = &maze->fields[current->row + 1][current->column];
-		}
+	if ((Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) &&
+		((maze->fields[current->row + 1][current->column].type != '#') || ((maze->fields[current->row + 1][current->column].type == '#') &&
+		y + 50.0f < maze->fields[current->row + 1][current->column].row * 50.0f)) &&
+		(x == maze->fields[current->row][current->column].column * 50.0f)) {
+		y += speedY;
+		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
+			current = &maze->fields[current->row - 1][current->column];
 	}
-	if (speedX < 0) {	//left
-		if (((maze->fields[current->row][current->column - 1].type != '#') || ((maze->fields[current->row][current->column - 1].type == '#') && x > maze->fields[current->row][current->column - 1].column * 50.0f + 72.5f)) && (y == maze->fields[current->row][current->column].row * 50.0f)) {
-			x += speedX;
-			if (maze->fields[current->row][current->column - 1].column * 50.f == x)
-				current = &maze->fields[current->row][current->column - 1];
-		}
+	if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) &&
+		((maze->fields[current->row][current->column - 1].type != '#') || ((maze->fields[current->row][current->column - 1].type == '#') &&
+		x > maze->fields[current->row][current->column - 1].column * 50.0f + 72.5f)) &&
+		(y == maze->fields[current->row][current->column].row * 50.0f)) {
+		x -= speedX;
+		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
+			current = &maze->fields[current->row - 1][current->column];
 	}
-	else if (speedX > 0) {	//right
-		if (((maze->fields[current->row][current->column + 1].type != '#') || ((maze->fields[current->row][current->column + 1].type == '#') && x + 50.0f < maze->fields[current->row][current->column + 1].column * 50.0f)) && (y == maze->fields[current->row][current->column].row * 50.0f)) {
-			x += speedX;
-			if (maze->fields[current->row][current->column + 1].column * 50.f == x)
-				current = &maze->fields[current->row][current->column + 1];
-		}
+	if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) &&
+		((maze->fields[current->row][current->column + 1].type != '#') || ((maze->fields[current->row][current->column + 1].type == '#') &&
+		x + 50.0f < maze->fields[current->row][current->column + 1].column * 50.0f)) &&
+		(y == maze->fields[current->row][current->column].row * 50.0f)) {
+		x += speedX;
+		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
+			current = &maze->fields[current->row - 1][current->column];
 	}
+
+	for (auto& rows : maze->fields)
+		for (auto& f : rows)
+			if (f.row * 50.0f >= y && f.row *50.0f + 50.0f <= y + 50.0f && f.column * 50.0f >= x && f.column*50.0f + 50.0f <= x + 50.0f) {
+				current->type = ' ';
+				current = &f;
+				current->type = '@';
+			}
+
 	/* Centering camera on player */
-	camera->setCenter(Vector2f(x + 12.5f, y));
-	
+	camera->setCenter(Vector2f(x + 12.5f, (float)y));
+
 	/* Collecting page	if it was on target tile */
 	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
 		maze->getCurrentPage()->collect(this, maze);
 
 	/* Collecting drink if there was one on target tile */
 	for (auto drink : *maze->getDrinks())
-	if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
-		drink->collect(this, maze);
+		if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
+			drink->collect(this, maze);
 }
+
+
 
 /* simple player serialization */
 void Player::savePlayer(ofstream* ofs) {
@@ -101,42 +117,30 @@ void Player::setFov(int f) {
 /* creating player on starting field with calculated field of view */
 Player::Player(Field* start) {
 	current = start;
+	start->type = '@';
+
 	x = start->column * 50.0f;
 	y = start->row * 50.0f;
-	speedX = 0;
-	speedY = 0;
+
+	speedX = 5;
+	speedY = 5;
+
 	fov = MSIZE / 5;
 }
 
-int Player::getSpeedX() {
-	return speedX;
-}
-
-int Player::getSpeedY() {
-	return speedY;
-}
-
-void Player::setSpeedX(int speed) {
-	speedX = speed;
-}
-
-void Player::setSpeedY(int speed) {
-	speedY = speed;
-}
-
-int Player::getX() {
+float Player::getX() {
 	return x;
 }
 
-int Player::getY() {
+float Player::getY() {
 	return y;
 }
 
-void Player::setX(int _x) {
+void Player::setX(float _x) {
 	x = _x;
 }
 
-void Player::setY(int _y) {
+void Player::setY(float _y) {
 	y = _y;
 }
 

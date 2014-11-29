@@ -122,11 +122,11 @@ void Maze::generateMaze() {
 	}
 
 	/* Spawning 1st page */
-	currentPage = new Page(this,start);
+	currentPage = new Page(this);
 
 	/* Spawning drinks */
 	for (int drink = 0; drink < amountDrinks; ++drink)
-		drinks.push_back(new Alcohol(this,start));
+		drinks.push_back(new Alcohol(this));
 }
 
 /* simple field serialization */

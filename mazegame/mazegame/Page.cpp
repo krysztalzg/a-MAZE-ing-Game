@@ -8,7 +8,7 @@ void Page::collect(Player* player, Maze* maze) {
 	maze->getCurrentPage()->setCollected(true);
 
 	if (player->getCollectedPages() < maze->getAmountPages())		// Generating next page if not all got collected
-		maze->setCurrentPage(new Page(maze,player->getCurrent()));
+		maze->setCurrentPage(new Page(maze));
 	else
 		maze->getEnd()->type = ' ';									// and opening exit if player collected all pages
 
@@ -21,15 +21,15 @@ void Page::collect(Player* player, Maze* maze) {
 }
 
 
-Page::Page(Maze* maze, Field* playerField) {
+Page::Page(Maze* maze) {
 	Field* temp;
-	
 	/* setting potion tile to random empty one */
 	do				
 		temp = &maze->fields[rand() % MSIZE][rand() % MSIZE];
-	while (temp->type != ' ' || temp == playerField);
+	while (temp->type != ' ');
 	
 	/* setting starting values */
+	temp->type = 'P';
 	setRow(temp->row);
 	setColumn(temp->column);
 	setCollected(false);

@@ -4,7 +4,7 @@
 #include "Player.h"
 
 
-Alcohol::Alcohol(Maze* maze, Field* playerField) {
+Alcohol::Alcohol(Maze* maze) {
 	int r, col;
 	texNo = rand() % 8;							//randomizing texture of potion from eight possible
 	do {										//setting potion tile to random empty one
@@ -16,7 +16,9 @@ Alcohol::Alcohol(Maze* maze, Field* playerField) {
 				break;
 			}
 		}
-	} while (maze->fields[r][col].type != ' ' || col == playerField->column || r == playerField->row);
+	} while (maze->fields[r][col].type != ' '); 
+
+	maze->fields[r][col].type = 'D';
 	setColumn(col);								//setting starting values
 	setRow(r);
 	setCollected(false);

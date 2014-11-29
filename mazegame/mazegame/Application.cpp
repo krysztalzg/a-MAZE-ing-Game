@@ -64,7 +64,11 @@ void Application::drawGame() {
 						sprites[TILE].setPosition(Vector2f(f.column * 50.0f, f.row * 50.0f));
 						window->draw(sprites[TILE]);
 						break;
-					case ' ':
+					/*case 'D':
+					case 'P':
+					case '@':
+					case ' ':*/
+					default:
 						sprites[TILE].setTextureRect(IntRect(100, 0, 50, 50));
 						sprites[TILE].setPosition(Vector2f(f.column * 50.0f, f.row * 50.0f));
 						window->draw(sprites[TILE]);
@@ -113,30 +117,38 @@ void Application::ApplicationMainLoop() {
 		while (window->pollEvent(event)) {				//polling next event
 			if (event.type == Event::KeyReleased) {		//if it was keyboard key released
 				switch (event.key.code) {				//executing appropriate action to key pressed
-				case Keyboard::Num1:					//Num1-9 changes players texture
+				case Keyboard::Numpad1:					//1-9, Num1-9 changes players texture
+				case Keyboard::Num1:					
 					playerTex = 0;
 					break;
+				case Keyboard::Numpad2:
 				case Keyboard::Num2:
 					playerTex = 1;
 					break;
+				case Keyboard::Numpad3:
 				case Keyboard::Num3:
 					playerTex = 2;
 					break;
+				case Keyboard::Numpad4:
 				case Keyboard::Num4:
 					playerTex = 3;
 					break;
 				case Keyboard::Num5:
 					playerTex = 4;
 					break;
+				case Keyboard::Numpad6:
 				case Keyboard::Num6:
 					playerTex = 5;
 					break;
+				case Keyboard::Numpad7:
 				case Keyboard::Num7:
 					playerTex = 6;
 					break;
+				case Keyboard::Numpad8:
 				case Keyboard::Num8:
 					playerTex = 7;
 					break;
+				case Keyboard::Numpad9:
 				case Keyboard::Num9:
 					int temp;
 					do
@@ -151,36 +163,6 @@ void Application::ApplicationMainLoop() {
 					break;
 				case Keyboard::Dash:
 					camera->zoom(0.5f);
-					break;
-
-
-				case Keyboard::Up:							//WSAD and Arrows control players movement
-				case Keyboard::W:
-					if (!Keyboard::isKeyPressed(Keyboard::Down) && !Keyboard::isKeyPressed(Keyboard::S))
-						player->setSpeedY(0);
-					else if (Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S))
-						player->setSpeedY(5);
-					break;
-				case Keyboard::Down:
-				case Keyboard::S:
-					if (!Keyboard::isKeyPressed(Keyboard::Up) && !Keyboard::isKeyPressed(Keyboard::W))
-						player->setSpeedY(0);
-					else if (Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W))
-						player->setSpeedY(-5);
-					break;
-				case Keyboard::Left:
-				case Keyboard::A:
-					if (!Keyboard::isKeyPressed(Keyboard::Right) && !Keyboard::isKeyPressed(Keyboard::D))
-						player->setSpeedX(0);
-					else if(Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D))
-						player->setSpeedX(5);
-					break;
-				case Keyboard::Right:
-				case Keyboard::D:
-					if (!Keyboard::isKeyPressed(Keyboard::Left) && !Keyboard::isKeyPressed(Keyboard::A))
-						player->setSpeedX(0);
-					else if (Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A))
-						player->setSpeedY(-5);
 					break;
 
 
@@ -216,31 +198,11 @@ void Application::ApplicationMainLoop() {
 					window->close();
 				}							
 			}
-			else if (event.type == Event::KeyPressed) {
-				switch (event.key.code) {
-				case Keyboard::Up:
-				case Keyboard::W:
-					player->setSpeedY(-5);
-					break;
-				case Keyboard::Down:
-				case Keyboard::S:
-					player->setSpeedY(5);
-					break;
-				case Keyboard::Left:
-				case Keyboard::A:
-					player->setSpeedX(-5);
-					break;
-				case Keyboard::Right:
-				case Keyboard::D:
-					player->setSpeedX(5);
-					break;
-				}
-			}
 		}
 		/* updating whole game */
 		player->move(maze, camera);
 		window->setView(*camera);
-		window->clear(Color::Color(125,125,125,255));
+		window->clear(Color::Color(130, 145, 90, 255));
 		drawGame();		
 		window->display();
 	}

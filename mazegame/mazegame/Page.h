@@ -7,7 +7,7 @@ class Player;
 class Page : public Item {
 public:
 	void collect(Player*, Maze*);
-	Page(Maze*, Field*);
+	Page(Maze*);
 	virtual ~Page();
 };
 

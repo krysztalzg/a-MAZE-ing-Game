@@ -13,7 +13,7 @@ public:
 
 	int getTexNo();
 
-	Alcohol(Maze* maze, Field*);
+	Alcohol(Maze* maze);
 	virtual ~Alcohol();
 };
 
