@@ -12,9 +12,9 @@ void Page::collect(Player* player, Maze* maze) {
 	else
 		maze->getEnd()->type = ' ';									// and opening exit if player collected all pages
 
-	for (int i = 0; i < MSIZE; ++i)									// After picking up page, 
-		for (int j = 0; j < MSIZE; ++j)								// visibility of all fields is reseted
-			if (i != 0 && i != MSIZE - 1 && j != 0 && j != MSIZE - 1)
+	for (int i = 0; i < maze->getSize(); ++i)									// After picking up page, 
+		for (int j = 0; j < maze->getSize(); ++j)								// visibility of all fields is reseted
+			if (i != 0 && i != maze->getSize() - 1 && j != 0 && j != maze->getSize() - 1)
 			maze->fields[i][j].seen = false;
 
 			maze->getEnd()->seen = false;
@@ -25,7 +25,7 @@ Page::Page(Maze* maze) {
 	Field* temp;
 	/* setting potion tile to random empty one */
 	do				
-		temp = &maze->fields[rand() % MSIZE][rand() % MSIZE];
+	temp = &maze->fields[rand() % maze->getSize()][rand() % maze->getSize()];
 	while (temp->type != ' ');
 	
 	/* setting starting values */

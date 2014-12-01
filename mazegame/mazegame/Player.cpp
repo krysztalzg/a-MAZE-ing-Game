@@ -12,48 +12,50 @@ using namespace sf;
 
 /* moving player in one of direction if there is no wall*/
 void Player::move(Maze* maze, View* camera) {
+	float turnTreshold = 15.0f;
 	//up
 	if ((Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W)) &&
 		((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') &&
-		y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f)) &&
-		(x == maze->fields[current->row][current->column].column * 50.0f)) {
-			y -= speedY;
-			if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
-				current = &maze->fields[current->row - 1][current->column];
+		y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f))) {
+		
+		x = maze->fields[current->row][current->column].column * 50.0f;
+		y -= speedY;
 	}
+	
 	if ((Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) &&
 		((maze->fields[current->row + 1][current->column].type != '#') || ((maze->fields[current->row + 1][current->column].type == '#') &&
-		y + 50.0f < maze->fields[current->row + 1][current->column].row * 50.0f)) &&
-		(x == maze->fields[current->row][current->column].column * 50.0f)) {
+		y + 50.0f < maze->fields[current->row + 1][current->column].row * 50.0f))) {
+
+		x = maze->fields[current->row][current->column].column * 50.0f;
 		y += speedY;
-		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
-			current = &maze->fields[current->row - 1][current->column];
 	}
+	
 	if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) &&
 		((maze->fields[current->row][current->column - 1].type != '#') || ((maze->fields[current->row][current->column - 1].type == '#') &&
-		x > maze->fields[current->row][current->column - 1].column * 50.0f + 72.5f)) &&
-		(y == maze->fields[current->row][current->column].row * 50.0f)) {
+		x > maze->fields[current->row][current->column - 1].column * 50.0f + 72.5f))) {
+
+		y = maze->fields[current->row][current->column].row * 50.0f;
 		x -= speedX;
-		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
-			current = &maze->fields[current->row - 1][current->column];
 	}
+	
 	if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) &&
 		((maze->fields[current->row][current->column + 1].type != '#') || ((maze->fields[current->row][current->column + 1].type == '#') &&
-		x + 50.0f < maze->fields[current->row][current->column + 1].column * 50.0f)) &&
-		(y == maze->fields[current->row][current->column].row * 50.0f)) {
+		x + 50.0f < maze->fields[current->row][current->column + 1].column * 50.0f))) {
+
+		y = maze->fields[current->row][current->column].row * 50.0f;
 		x += speedX;
-		if (maze->fields[current->row - 1][current->column].row * 50.0f == y)
-			current = &maze->fields[current->row - 1][current->column];
 	}
-
-	for (auto& rows : maze->fields)
-		for (auto& f : rows)
-			if (f.row * 50.0f >= y && f.row *50.0f + 50.0f <= y + 50.0f && f.column * 50.0f >= x && f.column*50.0f + 50.0f <= x + 50.0f) {
-				current->type = ' ';
-				current = &f;
-				current->type = '@';
-			}
-
+	
+	for (auto&& rows : make_pair(maze->fields, maze->fields + maze->getSize()))
+	for (auto& f : make_pair(rows, rows + maze->getSize()))
+	if (f.row * 50.0f >= y && f.row *50.0f + 50.0f <= y + 50.0f && f.column * 50.0f >= x && f.column*50.0f + 50.0f <= x + 50.0f
+		&& !(current->row == f.row && current->column == f.column)) {
+		current->type = ' ';
+		current = &f;
+		current->type = '@';
+		steps++;
+	}
+			
 	/* Centering camera on player */
 	camera->setCenter(Vector2f(x + 12.5f, (float)y));
 
@@ -115,7 +117,7 @@ void Player::setFov(int f) {
 }
 
 /* creating player on starting field with calculated field of view */
-Player::Player(Field* start) {
+Player::Player(Field* start, int size) {
 	current = start;
 	start->type = '@';
 
@@ -125,7 +127,8 @@ Player::Player(Field* start) {
 	speedX = 5;
 	speedY = 5;
 
-	fov = MSIZE / 5;
+	fov = size / 5;
+	if (fov < 2) fov = 2;
 }
 
 float Player::getX() {

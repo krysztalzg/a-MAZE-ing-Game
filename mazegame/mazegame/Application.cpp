@@ -19,7 +19,7 @@ enum texs{TILE, PLAYER, DRINK, PAGE, DOOR};
 
 Application::Application() {
 	maze = new Maze();							//first app is generating new maze
-	player = new Player(maze->getStart());		//then player is created at the starting field
+	player = new Player(maze->getStart(), maze->getSize());		//then player is created at the starting field
 	texManager = new textureManager();			//textureManagare load all textures
 
 	playerTex = rand()%8;						//players texture is randomly chosen from possible ones
@@ -40,8 +40,7 @@ Application::Application() {
 	sprites[DRINK].setTexture(texManager->getTexture("drink"));
 	sprites[DOOR].setTexture(texManager->getTexture("door"));
 
-	/* creating perspective centered at player 
-	  (TODO: center at maze and move when player get to edge of screen) */
+	/* creating perspective centered at player */
 	camera = new View();
 	camera->setCenter(Vector2f(player->getCurrent()->column * 50.0f, player->getCurrent()->row * 50.0f));
 	camera->setSize(Vector2f(1280, 720));
@@ -52,8 +51,8 @@ void Application::drawGame() {
 	bool temp = false;
 	vector <Alcohol*> drinks = *maze->getDrinks();
 	/* drawing all fields within players field of view and all seen earlier */
-		for (auto& rows : maze->fields) {
-			for (auto& f : rows) {
+		for (auto&& rows : make_pair(maze->fields,maze->fields+maze->getSize())) {
+			for (auto& f : make_pair(rows,rows+maze->getSize())) {
 				if ((abs(player->getCurrent()->column - f.column) < player->getFov() && abs(player->getCurrent()->row - f.row) < player->getFov()) ||
 					(abs(player->getCurrent()->column - f.column) < player->getFov() - 1 && abs(player->getCurrent()->row - f.row) < player->getFov() + 1) ||
 					(abs(player->getCurrent()->column - f.column) < player->getFov() + 1 && abs(player->getCurrent()->row - f.row) < player->getFov() - 1) || f.seen) {
@@ -97,15 +96,14 @@ void Application::drawGame() {
 		window->draw(sprites[PLAYER]);
 
 		/* draw exit if open and was seen after opening */
-		if (maze->getEnd()->type == ' ' && maze->getEnd()->seen) {
-			sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
-			window->draw(sprites[DOOR]);
-		}
-		else if (!maze->getEnd()->seen){
 			sprites[TILE].setTextureRect(IntRect(0, 0, 50, 50));
 			sprites[TILE].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
 			window->draw(sprites[TILE]);
-		}
+
+			if (maze->getEnd()->type == ' ' && maze->getEnd()->row == maze->getSize() - 1 && (maze->getEnd()->seen || maze->getEnd()->neighbours[0]->seen)) {
+				sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
+				window->draw(sprites[DOOR]);
+			}
 }
 
 /* main application loop */
@@ -113,7 +111,7 @@ void Application::ApplicationMainLoop() {
 	Event event;
 	string temp;
 
-	while (window->isOpen()) {							//looping until app window is closed
+	while (window->isOpen() ) {							//looping until app window is closed
 		while (window->pollEvent(event)) {				//polling next event
 			if (event.type == Event::KeyReleased) {		//if it was keyboard key released
 				switch (event.key.code) {				//executing appropriate action to key pressed
@@ -190,8 +188,8 @@ void Application::ApplicationMainLoop() {
 				}			
 
 				/* when player step into finish field app window is closing and displaying moves statistic in console */
-				if (player->getCurrent()->column == 0 || player->getCurrent()->column == MSIZE - 1 ||
-					player->getCurrent()->row == 0 || player->getCurrent()->row == MSIZE - 1) {
+				if (player->getCurrent()->column == 0 || player->getCurrent()->column == maze->getSize() - 1 ||
+					player->getCurrent()->row == 0 || player->getCurrent()->row == maze->getSize() - 1) {
 					cout << endl << "Steps: " << player->getSteps() << "/" << maze->getEnd()->steps << endl;
 
 					maze->setFinished(true);
@@ -200,7 +198,9 @@ void Application::ApplicationMainLoop() {
 			}
 		}
 		/* updating whole game */
-		player->move(maze, camera);
+		if (player->getCurrent()->column != maze->getEnd()->column || player->getCurrent()->row != maze->getEnd()->row)
+			player->move(maze, camera);
+
 		window->setView(*camera);
 		window->clear(Color::Color(130, 145, 90, 255));
 		drawGame();		

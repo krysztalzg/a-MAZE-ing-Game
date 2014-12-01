@@ -1,10 +1,14 @@
 #pragma once
+
 #include <vector>
 #include <fstream>
 
-#define MSIZE 23
-
 using namespace std;
+
+namespace std {
+	template <typename T> T* begin(pair<T*, T*> const& p) { return p.first;  }
+	template <typename T> T* end  (pair<T*, T*> const& p) { return p.second; }
+}
 
 class Page;
 class Alcohol;
@@ -25,13 +29,12 @@ private:
 	bool finished;
 
 	int amountPages, amountDrinks;
-	//int size;
+	int size;
 	vector <Alcohol*> drinks;
 	Page* currentPage;
 
 public:
-	//Field** fields;
-	Field fields[MSIZE][MSIZE];
+	Field** fields;
 
 	bool getFinished();
 	void setFinished(bool);
@@ -43,7 +46,7 @@ public:
 
 	int getAmountPages();
 	int getAmountDrinks();
-	//int getSize();
+	int getSize();
 
 	void setAmountPages(int);
 	void setAmountDrinks(int);

@@ -8,8 +8,8 @@ Alcohol::Alcohol(Maze* maze) {
 	int r, col;
 	texNo = rand() % 8;							//randomizing texture of potion from eight possible
 	do {										//setting potion tile to random empty one
-		r = rand() % MSIZE;
-		col = rand() % MSIZE;
+		r = rand() % maze->getSize();
+		col = rand() % maze->getSize();
 		for (auto drink : *maze->getDrinks()) {
 			if ((drink->getColumn() == col && drink->getRow() == r) || (maze->getCurrentPage()->getColumn() == col && maze->getCurrentPage()->getRow() == r)) {
 				col = r = 0;

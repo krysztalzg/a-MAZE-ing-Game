@@ -37,7 +37,7 @@ public:
 	void savePlayer(ofstream*);
 	void loadPlayer(ifstream*);
 
-	Player(Field*);
+	Player(Field*, int);
 	~Player();
 };
 
