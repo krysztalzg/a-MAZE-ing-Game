@@ -1,8 +1,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <SFML\System\Time.hpp>
-#include <SFML\Graphics.hpp>
+#include <SFML/System/Time.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "textureManager.h"
 #include "Player.h"
@@ -20,7 +20,7 @@ enum texs{TILE, PLAYER, DRINK, PAGE, DOOR};
 Application::Application() {
 	maze = new Maze();							//first app is generating new maze
 	player = new Player(maze->getStart(), maze->getSize());		//then player is created at the starting field
-	texManager = new textureManager();			//textureManagare load all textures
+	texManager = new TextureManager();			//textureManagare load all textures
 
 	playerTex = rand()%8;						//players texture is randomly chosen from possible ones
 
@@ -76,15 +76,15 @@ void Application::drawGame() {
 					f.seen = true;
 				}
 				/* draw page */
-				if (maze->getCurrentPage()->getColumn() == f.column && maze->getCurrentPage()->getRow() == f.row && !maze->getCurrentPage()->getCollected() && f.seen) {
-					sprites[PAGE].setPosition(Vector2f(maze->getCurrentPage()->getColumn() * 50.0f + 12.5f, maze->getCurrentPage()->getRow() * 50.0f + 12.5f));
+				if (*maze->getCurrentPage()->getField() == f && !maze->getCurrentPage()->getCollected() && f.seen) {
+					sprites[PAGE].setPosition(Vector2f(maze->getCurrentPage()->getField()->column * 50.0f + 12.5f, maze->getCurrentPage()->getField()->row * 50.0f + 12.5f));
 					window->draw(sprites[PAGE]);
 				}
 				/* draw drinks */		
 				for (auto d : drinks) {
-					if (d->getColumn() == f.column && d->getRow() == f.row && !d->getCollected() && f.seen) {
+					if (*d->getField() == f && !d->getCollected() && f.seen) {
 						sprites[DRINK].setTextureRect(IntRect(30 * d->getTexNo(), 0, 30, 50));
-						sprites[DRINK].setPosition(Vector2f(d->getColumn() * 50.0f + 12.5f, d->getRow() * 50.0f));
+						sprites[DRINK].setPosition(Vector2f(d->getField()->column * 50.0f + 12.5f, d->getField()->row * 50.0f));
 						window->draw(sprites[DRINK]);
 					}
 				}
@@ -96,18 +96,19 @@ void Application::drawGame() {
 		window->draw(sprites[PLAYER]);
 
 		/* draw exit if open and was seen after opening */
-			sprites[TILE].setTextureRect(IntRect(0, 0, 50, 50));
-			sprites[TILE].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
-			window->draw(sprites[TILE]);
+		sprites[TILE].setTextureRect(IntRect(0, 0, 50, 50));
+		sprites[TILE].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
+		window->draw(sprites[TILE]);
 
-			if (maze->getEnd()->type == ' ' && maze->getEnd()->row == maze->getSize() - 1 && (maze->getEnd()->seen || maze->getEnd()->neighbours[0]->seen)) {
-				sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
-				window->draw(sprites[DOOR]);
-			}
+		if (maze->getEnd()->type == 'E' && (maze->getEnd()->seen || (maze->getEnd()->neighbours[0]->seen && maze->getEnd()->neighbours[0]->type == ' '))) {
+			sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
+			window->draw(sprites[DOOR]);
+		}
 }
 
 /* main application loop */
 void Application::ApplicationMainLoop() {
+	bool finished = false, cheats = false;
 	Event event;
 	string temp;
 
@@ -116,7 +117,7 @@ void Application::ApplicationMainLoop() {
 			if (event.type == Event::KeyReleased) {		//if it was keyboard key released
 				switch (event.key.code) {				//executing appropriate action to key pressed
 				case Keyboard::Numpad1:					//1-9, Num1-9 changes players texture
-				case Keyboard::Num1:					
+				case Keyboard::Num1:
 					playerTex = 0;
 					break;
 				case Keyboard::Numpad2:
@@ -150,17 +151,17 @@ void Application::ApplicationMainLoop() {
 				case Keyboard::Num9:
 					int temp;
 					do
-						temp = rand()%8;
+					temp = rand() % 8;
 					while (temp == playerTex);
 					playerTex = temp;
 					break;
 
 
 				case Keyboard::Equal:						//steering view zoom
-					camera->zoom(1.5f);
+					camera->zoom(0.5f);
 					break;
 				case Keyboard::Dash:
-					camera->zoom(0.5f);
+					camera->zoom(1.5f);
 					break;
 
 
@@ -170,9 +171,9 @@ void Application::ApplicationMainLoop() {
 					sleep(seconds(0.5f));
 					break;
 				case Keyboard::F9:
-						loadGame();
-						cout << endl << "Game loaded" << endl;
-						sleep(seconds(0.5f));
+					loadGame();
+					cout << endl << "Game loaded" << endl;
+					sleep(seconds(0.5f));
 					break;
 
 
@@ -185,16 +186,29 @@ void Application::ApplicationMainLoop() {
 				case Keyboard::Escape:						//ESC close app window
 					window->close();
 					break;
-				}			
+				case Keyboard::F4:							//debug or cheat mode
+					cheats = true;							//allow to teleport by goals
+					if (player->getCollectedPages() < maze->getAmountPages()) {
+						player->setX(maze->getCurrentPage()->getField()->column*50.0f);
+						player->setY(maze->getCurrentPage()->getField()->row*50.0f);
+					}
+					else {
+						player->setX(maze->getEnd()->column*50.0f);
+						player->setY(maze->getEnd()->row*50.0f);
+						finished = true;
+						window->close();
+					}
+					break;
+				}
 
 				/* when player step into finish field app window is closing and displaying moves statistic in console */
 				if (player->getCurrent()->column == 0 || player->getCurrent()->column == maze->getSize() - 1 ||
 					player->getCurrent()->row == 0 || player->getCurrent()->row == maze->getSize() - 1) {
 					cout << endl << "Steps: " << player->getSteps() << "/" << maze->getEnd()->steps << endl;
 
-					maze->setFinished(true);
+					finished = true;
 					window->close();
-				}							
+				}
 			}
 		}
 		/* updating whole game */
@@ -206,8 +220,10 @@ void Application::ApplicationMainLoop() {
 		drawGame();		
 		window->display();
 	}
-
-	if (maze->getFinished())
+	/* Displaying summary after player finish playing */
+	if (cheats)
+		cout << "\"Congratualtions\", you cheated. " << player->getSteps() << " steps with " << maze->getEnd()->steps << " steps shortest possible." << endl << endl << endl;
+	else if (finished)
 		cout << "Congratualtion, maze finished with " << player->getSteps() << " steps with " << maze->getEnd()->steps << " steps shortest possible." << endl << endl << endl;
 	else
 		cout << "Maze not finished. " << player->getSteps() << " steps done with " << maze->getEnd()->steps << " steps shortest possible." << endl << endl << endl;

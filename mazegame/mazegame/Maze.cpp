@@ -11,6 +11,7 @@ using namespace std;
 
 
 Maze::Maze() {
+	/* player choose size of maze */
 	cout << "Enter maze size (odd number from 3 to 31): ";
 	cin >> size;
 	if (size <= 2) {
@@ -54,7 +55,6 @@ Maze::Maze() {
 
 	/* executing maze generation algorith */
 	generateMaze();
-	finished = false;
 }
 
 
@@ -184,7 +184,6 @@ void Maze::saveMaze(ofstream* ofs) {
 			saveField(ofs, &fields[i][j]);
 
 	currentPage->save(ofs);
-	ofs->write((char*)&finished, sizeof(bool));
 
 	ofs->write((char*)&amountPages, sizeof(int));
 	ofs->write((char*)&amountDrinks, sizeof(int));
@@ -206,7 +205,6 @@ void Maze::loadMaze(ifstream* ifs) {
 			fields[i][j] = *(loadField(ifs));
 
 	currentPage->load(ifs);
-	ifs->read((char*)&finished, sizeof(bool));
 
 	ifs->read((char*)&amountPages, sizeof(int));
 	ifs->read((char*)&amountDrinks, sizeof(int));
@@ -216,12 +214,6 @@ void Maze::loadMaze(ifstream* ifs) {
 		drinks[i]->load(ifs);
 }
 
-bool Maze::getFinished() {
-	return finished;
-}
-void Maze::setFinished(bool f) {
-	finished = f;
-}
 
 Field* Maze::getStart() {
 	return start;
@@ -253,8 +245,7 @@ Page* Maze::getCurrentPage() {
 
 void Maze::setCurrentPage(Page* p) {
 	currentPage->setCollected(p->getCollected());
-	currentPage->setRow(p->getRow());
-	currentPage->setColumn(p->getColumn());
+	currentPage->setField(p->getField());
 }
 
 void Maze::setAmountPages(int p) {

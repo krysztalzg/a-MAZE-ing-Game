@@ -10,7 +10,7 @@ void Page::collect(Player* player, Maze* maze) {
 	if (player->getCollectedPages() < maze->getAmountPages())		// Generating next page if not all got collected
 		maze->setCurrentPage(new Page(maze));
 	else
-		maze->getEnd()->type = ' ';									// and opening exit if player collected all pages
+		maze->getEnd()->type = 'E';									// and opening exit if player collected all pages
 
 	for (int i = 0; i < maze->getSize(); ++i)									// After picking up page, 
 		for (int j = 0; j < maze->getSize(); ++j)								// visibility of all fields is reseted
@@ -30,8 +30,7 @@ Page::Page(Maze* maze) {
 	
 	/* setting starting values */
 	temp->type = 'P';
-	setRow(temp->row);
-	setColumn(temp->column);
+	setField(temp);
 	setCollected(false);
 }
 

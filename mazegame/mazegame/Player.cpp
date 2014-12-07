@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "Maze.h"
 #include "Page.h"
@@ -12,8 +12,10 @@ using namespace sf;
 
 /* moving player in one of direction if there is no wall*/
 void Player::move(Maze* maze, View* camera) {
+	int speedY = 5,speedX = 5;
 	float turnTreshold = 15.0f;
-	//up
+
+	/* up */
 	if ((Keyboard::isKeyPressed(Keyboard::Up) || Keyboard::isKeyPressed(Keyboard::W)) &&
 		((maze->fields[current->row - 1][current->column].type != '#') || ((maze->fields[current->row - 1][current->column].type == '#') &&
 		y > maze->fields[current->row - 1][current->column].row * 50.0f + 50.0f))) {
@@ -21,7 +23,8 @@ void Player::move(Maze* maze, View* camera) {
 		x = maze->fields[current->row][current->column].column * 50.0f;
 		y -= speedY;
 	}
-	
+
+	/* down */
 	if ((Keyboard::isKeyPressed(Keyboard::Down) || Keyboard::isKeyPressed(Keyboard::S)) &&
 		((maze->fields[current->row + 1][current->column].type != '#') || ((maze->fields[current->row + 1][current->column].type == '#') &&
 		y + 50.0f < maze->fields[current->row + 1][current->column].row * 50.0f))) {
@@ -30,6 +33,7 @@ void Player::move(Maze* maze, View* camera) {
 		y += speedY;
 	}
 	
+	/* left */
 	if ((Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::A)) &&
 		((maze->fields[current->row][current->column - 1].type != '#') || ((maze->fields[current->row][current->column - 1].type == '#') &&
 		x > maze->fields[current->row][current->column - 1].column * 50.0f + 72.5f))) {
@@ -38,6 +42,7 @@ void Player::move(Maze* maze, View* camera) {
 		x -= speedX;
 	}
 	
+	/* right */
 	if ((Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::D)) &&
 		((maze->fields[current->row][current->column + 1].type != '#') || ((maze->fields[current->row][current->column + 1].type == '#') &&
 		x + 50.0f < maze->fields[current->row][current->column + 1].column * 50.0f))) {
@@ -46,10 +51,11 @@ void Player::move(Maze* maze, View* camera) {
 		x += speedX;
 	}
 	
+	/* updating current field and number of steps made*/
 	for (auto&& rows : make_pair(maze->fields, maze->fields + maze->getSize()))
 	for (auto& f : make_pair(rows, rows + maze->getSize()))
 	if (f.row * 50.0f >= y && f.row *50.0f + 50.0f <= y + 50.0f && f.column * 50.0f >= x && f.column*50.0f + 50.0f <= x + 50.0f
-		&& !(current->row == f.row && current->column == f.column)) {
+		&& !(*current == f)) {
 		current->type = ' ';
 		current = &f;
 		current->type = '@';
@@ -60,12 +66,12 @@ void Player::move(Maze* maze, View* camera) {
 	camera->setCenter(Vector2f(x + 12.5f, (float)y));
 
 	/* Collecting page	if it was on target tile */
-	if (maze->getCurrentPage()->getColumn() == current->column && maze->getCurrentPage()->getRow() == current->row && !maze->getCurrentPage()->getCollected())
+	if (maze->getCurrentPage()->getField() == current && !maze->getCurrentPage()->getCollected())
 		maze->getCurrentPage()->collect(this, maze);
 
 	/* Collecting drink if there was one on target tile */
 	for (auto drink : *maze->getDrinks())
-		if (drink->getColumn() == current->column && drink->getRow() == current->row && !drink->getCollected())
+		if (drink->getField() == current && !drink->getCollected())
 			drink->collect(this, maze);
 }
 
@@ -123,9 +129,6 @@ Player::Player(Field* start, int size) {
 
 	x = start->column * 50.0f;
 	y = start->row * 50.0f;
-
-	speedX = 5;
-	speedY = 5;
 
 	fov = size / 5;
 	if (fov < 2) fov = 2;

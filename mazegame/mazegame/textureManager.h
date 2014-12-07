@@ -6,14 +6,14 @@
 using namespace std;
 using namespace sf;
 
-class textureManager {
+class TextureManager {
 private:
 	map<string, Texture> textures;
 public:
 	void loadTexture(const string&, string);
 	Texture& getTexture(const string&);
 
-	textureManager();
-	virtual ~textureManager();
+	TextureManager();
+	virtual ~TextureManager();
 };
 

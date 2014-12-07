@@ -9,7 +9,7 @@ using namespace std;
 using namespace sf;
 
 
-void textureManager::loadTexture(const string &name, string filename) {
+void TextureManager::loadTexture(const string &name, string filename) {
 	Texture* tex = new Texture();
 
 	/* loading texture from file */
@@ -25,12 +25,12 @@ void textureManager::loadTexture(const string &name, string filename) {
 	return;
 }
 
-Texture& textureManager::getTexture(const string &texture) {
+Texture& TextureManager::getTexture(const string &texture) {
 	return this->textures.at(texture);
 }
 
 /* loading all textures on texture manager creating*/
-textureManager::textureManager() {
+TextureManager::TextureManager() {
 	loadTexture("tile", "tile.png");
 	loadTexture("player", "player.png");
 	loadTexture("page", "key.png");
@@ -42,4 +42,4 @@ textureManager::textureManager() {
 	loadTexture("splash3", "splash3.png");
 }
 
-textureManager::~textureManager() {}
+TextureManager::~TextureManager() {}

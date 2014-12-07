@@ -12,6 +12,8 @@ int main() {
 	Application* app = new Application();
 
 	app->ApplicationMainLoop();
-	system("pause");
+
+	cout << "Press enter to continue ...";
+	cin.get();
 	return 0;
 }

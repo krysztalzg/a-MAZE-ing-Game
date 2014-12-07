@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 #define TEX_NUM 7
 
 class Player;
 class Maze;
-class textureManager;
+class TextureManager;
 
 using namespace sf;
 
@@ -17,7 +17,7 @@ private:
 public:
 	Player* player;
 	Maze* maze;
-	textureManager* texManager;
+	TextureManager* texManager;
 	int playerTex;
 
 	Sprite splash;

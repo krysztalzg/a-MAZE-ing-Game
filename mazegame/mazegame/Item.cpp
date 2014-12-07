@@ -16,26 +16,32 @@ void Item::load(ifstream* ifs) {
 	ifs->read((char*)&collected, sizeof(bool));
 }
 
-
+/*
 int Item::getRow() {
 	return row;
 }
 
 int Item::getColumn() {
 	return column;
+}*/
+Field* Item::getField() {
+	return field;
 }
 
 bool Item::getCollected() {
 	return collected;
 }
 
-
+/*
 void Item::setRow(int r) {
 	row = r;
 }
 
 void Item::setColumn(int c) {
 	column = c;
+}*/
+void Item::setField(Field* f) {
+	field = f;
 }
 
 void Item::setCollected(bool c) {

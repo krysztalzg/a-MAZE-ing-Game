@@ -1,7 +1,7 @@
 #pragma once
 #include "Maze.h"
 #include <fstream>
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 class Alcohol;
 struct Field;
@@ -9,7 +9,6 @@ struct Field;
 class Player {
 private:
 	int steps, fov;
-	int speedX, speedY;
 	float x, y;
 	int collectedPages;
 
@@ -17,19 +16,19 @@ private:
 	vector <Alcohol*> collectedDrinks;
 
 public:
-	int getSteps();
-	int getFov();
+	int  getSteps();
+	int  getFov();
 	void setFov(int);
 
 	float getY();
 	float getX();
-	void setX(float);
-	void setY(float);
+	void  setX(float);
+	void  setY(float);
 
-	int getCollectedPages();
-	void setCollectedPages();
+	int    getCollectedPages();
+	void   setCollectedPages();
 	vector <Alcohol*> *getCollectedDrinks();
-	
+
 	Field* getCurrent();
 
 	void move(Maze*, sf::View*);

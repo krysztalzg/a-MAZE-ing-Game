@@ -14,19 +14,23 @@ class Page;
 class Alcohol;
 class Player;
 
-struct Field {
-	int row, column, steps;
-	char type;
-	bool visited, seen;
-	vector <Field*> neighbours;
+struct Field {							//Field types:
+	int row, column, steps;				//# - Wall | ' ' - Empty tile
+	char type;							//P - Page | D - Drink
+	bool visited, seen;					//E - Exit | @ - Player
+	vector <Field*> neighbours;			
+
+	bool operator==(const Field& field) {
+		return (this->column == field.column && this->row == field.row);
+	}
 };
+
 
 class Maze {
 private:
 	Field *start, *end;
 
 	vector<Field*> path;
-	bool finished;
 
 	int amountPages, amountDrinks;
 	int size;
@@ -36,10 +40,6 @@ private:
 public:
 	Field** fields;
 
-	bool getFinished();
-	void setFinished(bool);
-
-	Field** getFields();
 	Field* getStart();
 	Field* getEnd();
 	vector<Field*> getPath();
@@ -66,4 +66,3 @@ public:
 	Maze();
 	~Maze();
 };
-
