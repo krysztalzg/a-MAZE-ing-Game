@@ -10,17 +10,11 @@ Alcohol::Alcohol(Maze* maze) {
 	do {										//setting potion tile to random empty one
 		r = rand() % maze->getSize();
 		col = rand() % maze->getSize();
-		for (auto drink : *maze->getDrinks()) {
-			if ((drink->getField()->column == col && drink->getField()->row == r) || (maze->getCurrentPage()->getField()->column == col && maze->getCurrentPage()->getField()->row == r)) {
-				col = r = 0;
-				break;
-			}
-		}
 	} while (maze->fields[r][col].type != ' '); 
 
 	/* setting starting values */
 	maze->fields[r][col].type = 'D';
-	setField(&maze->fields[col][r]);
+	setField(&maze->fields[r][col]);
 	setCollected(false);
 }
 

@@ -79,6 +79,28 @@ void Maze::findNeighbours(Field* field) {
 		field->neighbours.push_back(&fields[row][col+2]);
 }
 
+void Maze::endNeighbours() {
+	end->neighbours.clear();
+
+	if (end->row - 1 >= 0)
+		if (fields[end->row - 1][end->column].type == ' ' && fields[end->row - 1][end->column].seen)
+			end->neighbours.push_back(&fields[end->row - 1][end->column]);
+
+	if (end->row + 1 < size)
+		if (fields[end->row + 1][end->column].type == ' ' && fields[end->row + 1][end->column].seen)
+			end->neighbours.push_back(&fields[end->row + 1][end->column]);
+
+	if (end->column - 1 >= 0)
+		if (fields[end->row][end->column - 1].type == ' ' && fields[end->row][end->column - 1].seen)
+			end->neighbours.push_back(&fields[end->row][end->column - 1]);
+
+	if (end->column + 1 < size)
+		if (fields[end->row][end->column + 1].type == ' ' && fields[end->row][end->column + 1].seen)
+			end->neighbours.push_back(&fields[end->row][end->column + 1]);
+}
+
+
+
 Maze::~Maze(){}
 
 
@@ -91,6 +113,7 @@ void Maze::generateMaze() {
 	while (start->type != ' ');
 	start->steps = 0;
 	start->visited = true;
+	start->type = '@';
 
 	current = start;
 	/* Generating maze with DFS algorithm */
@@ -176,42 +199,64 @@ Field* Maze::loadField(ifstream* ifs) {
 
 /* simple maze serialization */
 void Maze::saveMaze(ofstream* ofs) {
-	saveField(ofs, start);
-	saveField(ofs, end);
+	ofs->write((char*)&size, sizeof(int));
+
+	ofs->write((char*)&start->column, sizeof(int));
+	ofs->write((char*)&start->row, sizeof(int));
+	ofs->write((char*)&end->column, sizeof(int));
+	ofs->write((char*)&end->row, sizeof(int));
 
 	for (int i = 0; i < size; ++i)
 	for (int j = 0; j < size; ++j)
 			saveField(ofs, &fields[i][j]);
 
-	currentPage->save(ofs);
-
+	currentPage->save(ofs, this);
 	ofs->write((char*)&amountPages, sizeof(int));
 	ofs->write((char*)&amountDrinks, sizeof(int));
-	unsigned int size = drinks.size();
-	ofs->write(reinterpret_cast<const char *>(&size), sizeof(size));
-	for (unsigned int i = 0; i < size; ++i)
-		drinks[i]->save(ofs);
+
+	unsigned int dsize = drinks.size();
+	ofs->write((char*)&dsize, sizeof(unsigned int));
+	for (unsigned int i = 0; i < dsize; ++i)
+		drinks[i]->save(ofs,this);
 }
 
 /* simple maze deserialization */
 void Maze::loadMaze(ifstream* ifs) {
 	unsigned int drinksSize;
+	int sc, sr, ec, er;
 
-	start = loadField(ifs);
-	end = loadField(ifs);
+	ifs->read((char*)&size, sizeof(int));
+
+	ifs->read((char*)&sc, sizeof(int));
+	ifs->read((char*)&sr, sizeof(int));
+	ifs->read((char*)&ec, sizeof(int));
+	ifs->read((char*)&er, sizeof(int));
+
+	fields = new Field*[size];
+	for (int i = 0; i < size; ++i)
+		fields[i] = new Field[size];
 
 	for (int i = 0; i < size; ++i)
 	for (int j = 0; j < size; ++j)
 			fields[i][j] = *(loadField(ifs));
 
-	currentPage->load(ifs);
+	start = &fields[sr][sc];
+	end = &fields[er][ec];
+
+	currentPage->load(ifs,this);
 
 	ifs->read((char*)&amountPages, sizeof(int));
 	ifs->read((char*)&amountDrinks, sizeof(int));
-	ifs->read(reinterpret_cast<char *>(&drinksSize), sizeof(sizeof(drinks)));
-	drinks.resize(drinksSize);
-	for (unsigned int i = 0; i < drinksSize; ++i)
-		drinks[i]->load(ifs);
+
+	drinks.clear();
+	ifs->read((char*)&drinksSize, sizeof(unsigned int));
+	Alcohol* temp = new Alcohol(this);
+	for (unsigned int i = 0; i < drinksSize; ++i) {
+		temp->load(ifs, this);
+		drinks.push_back(temp);
+	}
+
+	endNeighbours();
 }
 
 

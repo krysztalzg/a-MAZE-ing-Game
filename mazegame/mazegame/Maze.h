@@ -56,6 +56,7 @@ public:
 	void setCurrentPage(Page*);
 
 	void findNeighbours(Field*);
+	void endNeighbours();
 	void generateMaze();
 
 	void saveMaze(ofstream*);

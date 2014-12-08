@@ -18,16 +18,19 @@ using namespace sf;
 enum texs{TILE, PLAYER, DRINK, PAGE, DOOR};
 
 Application::Application() {
-	maze = new Maze();							//first app is generating new maze
+	maze = new Maze();											//first app is generating new maze
 	player = new Player(maze->getStart(), maze->getSize());		//then player is created at the starting field
-	texManager = new TextureManager();			//textureManagare load all textures
+	texManager = new TextureManager();							//textureManagare load all textures
 
-	playerTex = rand()%8;						//players texture is randomly chosen from possible ones
+	playerTex = rand()%8;										//players texture is randomly chosen from possible ones
 
 	/* creating window with given size, title and framerate */
 	window = new RenderWindow();	
 	window->create(VideoMode(1280, 720), "a-MAZE-ing Game");
 	window->setFramerateLimit(60);
+	Vector2i windowPos = window->getPosition();
+	windowPos.y -= 15;
+	window->setPosition(windowPos);
 
 	drawSplash("splash1");
 	drawSplash("splash2");
@@ -100,7 +103,7 @@ void Application::drawGame() {
 		sprites[TILE].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
 		window->draw(sprites[TILE]);
 
-		if (maze->getEnd()->type == 'E' && (maze->getEnd()->seen || (maze->getEnd()->neighbours[0]->seen && maze->getEnd()->neighbours[0]->type == ' '))) {
+		if (maze->getEnd()->type == 'E' && maze->getEnd()->neighbours.size() > 0) {
 			sprites[DOOR].setPosition(Vector2f(maze->getEnd()->column * 50.0f, maze->getEnd()->row * 50.0f));
 			window->draw(sprites[DOOR]);
 		}
@@ -212,6 +215,8 @@ void Application::ApplicationMainLoop() {
 			}
 		}
 		/* updating whole game */
+		maze->endNeighbours();
+
 		if (player->getCurrent()->column != maze->getEnd()->column || player->getCurrent()->row != maze->getEnd()->row)
 			player->move(maze, camera);
 

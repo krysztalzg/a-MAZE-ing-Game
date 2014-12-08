@@ -1,29 +1,25 @@
+#include "Maze.h"
 #include "Item.h"
 
 using namespace std;
 
 /* simple item serialization */
-void Item::save(ofstream* ofs) {
-	ofs->write((char*)&row, sizeof(int));
-	ofs->write((char*)&column, sizeof(int));
+void Item::save(ofstream* ofs, Maze* maze) {
+	ofs->write((char*)&field->column, sizeof(int));
+	ofs->write((char*)&field->row, sizeof(int));
 	ofs->write((char*)&collected, sizeof(bool));
 }
 
 /* simple item deserialization */
-void Item::load(ifstream* ifs) {
-	ifs->read((char*)&row, sizeof(int));
-	ifs->read((char*)&column, sizeof(int));
+void Item::load(ifstream* ifs, Maze* maze) {
+	int c, r;
+	ifs->read((char*)&c, sizeof(int));
+	ifs->read((char*)&r, sizeof(int));
 	ifs->read((char*)&collected, sizeof(bool));
+	field = &maze->fields[r][c];
 }
 
-/*
-int Item::getRow() {
-	return row;
-}
 
-int Item::getColumn() {
-	return column;
-}*/
 Field* Item::getField() {
 	return field;
 }
